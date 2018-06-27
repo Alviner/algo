@@ -119,43 +119,42 @@ def merge_list(list_one: LinkedList, list_two: LinkedList):
     return res
 
 
-def print_task(func):
-    @wraps(func)
-    def wrapped():
-        print('{:#^30}'.format(func.__name__))
-        func()
-        print('{:#^30}'.format(''))
-    return wrapped
-
-
-@print_task
-def t11():
+def remove_test():
     s_list = LinkedList()
     s_list.add_in_tail(Node(1))
+    s_list.add_in_tail(Node(2))
     s_list.add_in_tail(Node(1))
     s_list.add_in_tail(Node(2))
-    s_list.add_in_tail(Node(2))
-    s_list.add_in_tail(Node(128))
-    s_list.add_in_tail(Node(128))
-    s_list.add_in_tail(Node(9))
+    s_list.add_in_tail(Node(1))
+    s_list.add_in_tail(Node(10))
+    s_list.add_in_tail(Node(3))
+    s_list.add_in_tail(Node(1))
+    s_list.add_in_tail(Node(4))
+    s_list.add_in_tail(Node(1))
 
-    s_list.print_all_nodes()
+    s_list_test = LinkedList()
+    s_list_test.add_in_tail(Node(2))
+    s_list_test.add_in_tail(Node(1))
+    s_list_test.add_in_tail(Node(2))
+    s_list_test.add_in_tail(Node(1))
+    s_list_test.add_in_tail(Node(1))
+    s_list_test.add_in_tail(Node(1))
 
     s_list.remove(1)
-    print('single remove 1')
-    s_list.print_all_nodes()
+    s_list.remove(10)
+    s_list.remove(3)
+    s_list.remove(4)
+    assert s_list.size() == s_list_test.size()
 
-    print('single remove 2')
-    s_list.remove(2)
-    s_list.print_all_nodes()
+    node = s_list.head
+    node_test = s_list_test.head
+    while node is not None and node_test is not None:
+        assert node.value == node_test.value
+        node = node.next
+        node_test = node_test.next
 
-    print('single remove 9')
-    s_list.remove(9)
-    s_list.print_all_nodes()
 
-
-@print_task
-def t12():
+def mass_remove_test():
     s_list = LinkedList()
     s_list.add_in_tail(Node(1))
     s_list.add_in_tail(Node(1))
@@ -171,19 +170,25 @@ def t12():
     s_list.add_in_tail(Node(1))
     s_list.add_in_tail(Node(9))
 
-    s_list.print_all_nodes()
+    s_list_test = LinkedList()
+    s_list_test.add_in_tail(Node(2))
+    s_list_test.add_in_tail(Node(2))
+    s_list_test.add_in_tail(Node(128))
+    s_list_test.add_in_tail(Node(128))
 
     s_list.remove(1, mass=True)
-    print('mass remove 1')
-    s_list.print_all_nodes()
-
-    print('mass remove 9')
     s_list.remove(9, mass=True)
-    s_list.print_all_nodes()
+    assert s_list.size() == s_list_test.size()
+
+    node = s_list.head
+    node_test = s_list_test.head
+    while node is not None and node_test is not None:
+        assert node.value == node_test.value
+        node = node.next
+        node_test = node_test.next
 
 
-@print_task
-def t13():
+def clear_test():
     s_list = LinkedList()
     s_list.add_in_tail(Node(1))
     s_list.add_in_tail(Node(1))
@@ -198,15 +203,16 @@ def t13():
     s_list.add_in_tail(Node(9))
     s_list.add_in_tail(Node(1))
     s_list.add_in_tail(Node(9))
-
-    s_list.print_all_nodes()
 
     s_list.clear()
-    s_list.print_all_nodes()
+
+    assert s_list.size() == 0
+
+    assert s_list.head is None
+    assert s_list.tail is None
 
 
-@print_task
-def t14():
+def mass_search_test():
     s_list = LinkedList()
     s_list.add_in_tail(Node(1))
     s_list.add_in_tail(Node(1))
@@ -222,39 +228,35 @@ def t14():
     s_list.add_in_tail(Node(1))
     s_list.add_in_tail(Node(9))
 
-    s_list.print_all_nodes()
-
-    print(s_list.find_all(9))
-    print(s_list.find_all(128))
-    print(s_list.find_all(2))
+    assert len(s_list.find_all(9)) == 4
+    assert len(s_list.find_all(1)) == 5
+    assert len(s_list.find_all(128)) == 2
 
 
-@print_task
-def t15():
+def size_test():
     s_list = LinkedList()
     s_list.add_in_tail(Node(1))
-    print(s_list.size())
+    assert s_list.size() == 1
     s_list.add_in_tail(Node(1))
-    print(s_list.size())
+    assert s_list.size() == 2
     s_list.add_in_tail(Node(1))
     s_list.add_in_tail(Node(2))
     s_list.add_in_tail(Node(2))
-    print(s_list.size())
+    assert s_list.size() == 5
     s_list.add_in_tail(Node(128))
     s_list.add_in_tail(Node(128))
     s_list.add_in_tail(Node(9))
     s_list.add_in_tail(Node(9))
     s_list.add_in_tail(Node(1))
-    print(s_list.size())
+    assert s_list.size() == 10
     s_list.add_in_tail(Node(9))
     s_list.add_in_tail(Node(1))
-    print(s_list.size())
+    assert s_list.size() == 12
     s_list.add_in_tail(Node(9))
-    print(s_list.size())
+    assert s_list.size() == 13
 
 
-@print_task
-def t16():
+def add_in_pos_test():
     s_list = LinkedList()
     s_list.add_in_tail(Node(1))
     s_list.add_in_tail(Node(1))
@@ -270,7 +272,27 @@ def t16():
     s_list.add_in_tail(Node(1))
     s_list.add_in_tail(Node(9))
 
-    s_list.print_all_nodes()
+    s_list_test = LinkedList()
+    s_list_test.add_in_tail(Node(-9))
+    s_list_test.add_in_tail(Node(-10))
+    s_list_test.add_in_tail(Node(-11))
+    s_list_test.add_in_tail(Node(-2))
+    s_list_test.add_in_tail(Node(1))
+    s_list_test.add_in_tail(Node(1))
+    s_list_test.add_in_tail(Node(1))
+    s_list_test.add_in_tail(Node(2))
+    s_list_test.add_in_tail(Node(-1))
+    s_list_test.add_in_tail(Node(-3))
+    s_list_test.add_in_tail(Node(2))
+    s_list_test.add_in_tail(Node(128))
+    s_list_test.add_in_tail(Node(128))
+    s_list_test.add_in_tail(Node(9))
+    s_list_test.add_in_tail(Node(9))
+    s_list_test.add_in_tail(Node(1))
+    s_list_test.add_in_tail(Node(9))
+    s_list_test.add_in_tail(Node(1))
+    s_list_test.add_in_tail(Node(9))
+    s_list_test.add_in_tail(Node(-111))
 
     s_list.add_in_pos(Node(-11), 0)
     s_list.add_in_pos(Node(-10), 0)
@@ -279,11 +301,18 @@ def t16():
     s_list.add_in_pos(Node(-2), 2)
     s_list.add_in_pos(Node(-3), 8)
     s_list.add_in_pos(Node(-111), s_list.size() - 1)
-    s_list.print_all_nodes()
+
+    assert s_list.size() == s_list_test.size()
+
+    node = s_list.head
+    node_test = s_list_test.head
+    while node is not None and node_test is not None:
+        assert node.value == node_test.value
+        node = node.next
+        node_test = node_test.next
 
 
-@print_task
-def t17():
+def merge_test():
     s_list_one = LinkedList()
     s_list_one.add_in_tail(Node(1))
     s_list_one.add_in_tail(Node(2))
@@ -298,8 +327,6 @@ def t17():
     s_list_one.add_in_tail(Node(11))
     s_list_one.add_in_tail(Node(12))
     s_list_one.add_in_tail(Node(13))
-
-    s_list_one.print_all_nodes()
 
     s_list_two = LinkedList()
     s_list_two.add_in_tail(Node(13))
@@ -316,17 +343,39 @@ def t17():
     s_list_two.add_in_tail(Node(2))
     s_list_two.add_in_tail(Node(1))
 
-    s_list_two.print_all_nodes()
-
     s_list_merged = merge_list(s_list_two, s_list_one)
-    s_list_merged.print_all_nodes()
+
+    s_list_test = LinkedList()
+
+    s_list_test.add_in_tail(Node(14))
+    s_list_test.add_in_tail(Node(14))
+    s_list_test.add_in_tail(Node(14))
+    s_list_test.add_in_tail(Node(14))
+    s_list_test.add_in_tail(Node(14))
+    s_list_test.add_in_tail(Node(14))
+    s_list_test.add_in_tail(Node(14))
+    s_list_test.add_in_tail(Node(14))
+    s_list_test.add_in_tail(Node(14))
+    s_list_test.add_in_tail(Node(14))
+    s_list_test.add_in_tail(Node(14))
+    s_list_test.add_in_tail(Node(14))
+    s_list_test.add_in_tail(Node(14))
+
+    assert s_list_merged.size() == s_list_test.size()
+
+    node = s_list_merged.head
+    node_test = s_list_test.head
+    while node is not None and node_test is not None:
+        assert node.value == node_test.value
+        node = node.next
+        node_test = node_test.next
 
 
 if __name__ == '__main__':
-    t11()
-    t12()
-    t13()
-    t14()
-    t15()
-    t16()
-    t17()
+    remove_test()
+    mass_remove_test()
+    clear_test()
+    mass_search_test()
+    size_test()
+    add_in_pos_test()
+    merge_test()
