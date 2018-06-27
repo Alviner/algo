@@ -65,6 +65,21 @@ class LinkedList:
                         return
             node = node.next if go_next else node
 
+    def remove_with_tmp(self, val, mass=False):
+        prev_node = None
+        node = self.head
+        while node is not None:
+            if node.value == val:
+                if prev_node is None:
+                    self.head = node.next
+                else:
+                    prev_node.next = node.next
+                if not mass:
+                    return
+            else:
+                prev_node = node
+            node = node.next
+
     def find_all(self, val):
         node = self.head
         res = []
@@ -140,10 +155,10 @@ def remove_test():
     s_list_test.add_in_tail(Node(1))
     s_list_test.add_in_tail(Node(1))
 
-    s_list.remove(1)
-    s_list.remove(10)
-    s_list.remove(3)
-    s_list.remove(4)
+    s_list.remove_with_tmp(1)
+    s_list.remove_with_tmp(10)
+    s_list.remove_with_tmp(3)
+    s_list.remove_with_tmp(4)
     assert s_list.size() == s_list_test.size()
 
     node = s_list.head
@@ -176,8 +191,8 @@ def mass_remove_test():
     s_list_test.add_in_tail(Node(128))
     s_list_test.add_in_tail(Node(128))
 
-    s_list.remove(1, mass=True)
-    s_list.remove(9, mass=True)
+    s_list.remove_with_tmp(1, mass=True)
+    s_list.remove_with_tmp(9, mass=True)
     assert s_list.size() == s_list_test.size()
 
     node = s_list.head
