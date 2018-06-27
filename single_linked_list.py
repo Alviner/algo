@@ -70,6 +70,8 @@ class LinkedList:
         node = self.head
         while node is not None:
             if node.value == val:
+                if node == self.tail:
+                    self.tail = prev_node
                 if prev_node is None:
                     self.head = node.next
                 else:
