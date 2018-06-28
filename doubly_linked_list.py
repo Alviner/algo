@@ -47,7 +47,8 @@ class LinkedList:
             if node.value == val:
                 if node.prev is None:
                     self.head = node.next
-                    node.next.prev = None
+                    if node.next is not None:
+                        node.next.prev = None
                 elif node.next is None:
                     self.tail = node.prev
                     node.prev.next = None
@@ -56,6 +57,20 @@ class LinkedList:
                     node.next.prev = node.prev
                 return
             node = node.next
+
+    def remove_find(self, val):
+        node = self.find(val)
+        if node is not None:
+            if node.prev is None:
+                self.head = node.next
+                if node.next is not None:
+                    node.next.prev = None
+            elif node.next is None:
+                self.tail = node.prev
+                node.prev.next = None
+            else:
+                node.prev.next = node.next
+                node.next.prev = node.prev
 
     def add_in_head(self, item):
         if self.head is not None:
@@ -112,10 +127,10 @@ def remove_test():
     s_list_test.add_in_tail(Node(1))
     s_list_test.add_in_tail(Node(1))
 
-    s_list.remove(1)
-    s_list.remove(10)
-    s_list.remove(3)
-    s_list.remove(4)
+    s_list.remove_find(1)
+    s_list.remove_find(10)
+    s_list.remove_find(3)
+    s_list.remove_find(4)
 
     assert s_list.size() == s_list_test.size()
 
