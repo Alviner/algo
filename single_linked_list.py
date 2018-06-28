@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from functools import wraps
-
 
 class Node:
     def __init__(self, v):
