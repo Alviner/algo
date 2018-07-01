@@ -30,7 +30,7 @@ class DynArray:
         self.array[self.count] = item
         self.count += 1
 
-    def insert(self, i, itm):  # O(1) когда вставка в конец, обычно O(n)
+    def insert(self, i, itm):  # O(n)
         if 0 > i > self.count:
             raise IndexError('Index out of bounds')
         if i == self.count:
