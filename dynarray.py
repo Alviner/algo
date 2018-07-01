@@ -38,16 +38,19 @@ class DynArray:
             return
         if self.count == self.capacity:
             new_capacity = 2 * self.capacity
+            new_array = self.make_array(new_capacity)
         else:
             new_capacity = self.capacity
-        new_array = self.make_array(new_capacity)
-        for item in range(self.count):
+            new_array = self.array
+
+        for item in reversed(range(self.count)):
             if item < i:
                 new_array[item] = self.array[item]
-                continue
             elif item == i:
+                new_array[item + 1] = self.array[item]
                 new_array[item] = itm
-            new_array[item + 1] = self.array[item]
+            else:
+                new_array[item + 1] = self.array[item]
         self.count += 1
         self.array = new_array
         self.capacity = new_capacity
@@ -55,14 +58,12 @@ class DynArray:
     def delete(self, i):  # O(n)
         if 0 > i >= self.count:
             raise IndexError('Index out of bounds')
-        new_array = self.make_array(self.capacity)
         for item in range(self.count - 1):
             if item < i:
-                new_array[item] = self.array[item]
+                continue
             else:
-                new_array[item] = self.array[item + 1]
+                self.array[item] = self.array[item + 1]
         self.count -= 1
-        self.array = new_array
         if self.count <= 2 * self.capacity:
             new_capacity = max(int(2 * self.capacity / 3), 16)
             self.resize(new_capacity)
