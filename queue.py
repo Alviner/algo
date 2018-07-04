@@ -26,10 +26,10 @@ class StackQueue:
         self.right = Stack()
         self.left = Stack()
 
-    def enqueue(self, item):
+    def enqueue(self, item):  # O(n)
         self.right.push(item)
 
-    def dequeue(self):
+    def dequeue(self):  # O(n)
         if self.left.size() == 0:
             while self.right.size() > 0:
                 self.left.push(self.right.pop())
