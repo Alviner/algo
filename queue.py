@@ -58,12 +58,15 @@ def test_rotate():
 
     qu.rotate(22)
     qu_stack.rotate(22)
+    qu.enqueue(5)
+    qu_stack.enqueue(5)
 
     qu_test = Queue()
     qu_test.enqueue(3)
     qu_test.enqueue(4)
     qu_test.enqueue(1)
     qu_test.enqueue(2)
+    qu_test.enqueue(5)
 
     assert qu.size() == qu_test.size() == qu_stack.size()
 
