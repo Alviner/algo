@@ -30,6 +30,9 @@ def check_palindrome(check_string):
     deq = Deque()
     is_palindlome = True
 
+    check_string = check_string.lower()
+    check_string = check_string.replace(' ', '')
+
     for i in range(int(len(check_string) / 2)):
         deq.addFront(check_string[i])
         deq.addTail(check_string[-(i + 1)])
@@ -44,13 +47,15 @@ def check_palindrome(check_string):
 
 
 def test_palindrome():
-    check_string = '123456789987654321'
+    check_string = 'А роза упала на лапу Азора'
     assert check_palindrome(check_string)
-    check_string = 'asdf'
-    assert not check_palindrome(check_string)
-    check_string = 'asdf;lkjkl;fdsa'
+    check_string = 'Аргентина манит негра'
     assert check_palindrome(check_string)
-    check_string = '11'
+    check_string = 'Я иду с мечем судия'
+    assert check_palindrome(check_string)
+    check_string = 'Sum summus mus'
+    assert check_palindrome(check_string)
+    check_string = 'Saippuakivikauppias'
     assert check_palindrome(check_string)
     check_string = '223'
     assert not check_palindrome(check_string)
