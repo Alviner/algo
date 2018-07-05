@@ -73,10 +73,13 @@ class LinkedList:
                 node.next.prev = node.prev
 
     def add_in_head(self, item):
-        if self.head is not None:
+        if self.tail is None:
+            self.tail = item
+            item.prev = None
+            item.next = None
+        else:
             self.head.prev = item
-        item.next = self.head
-        item.prev = None
+            item.next = self.head
         self.head = item
 
     def add_in_pos(self, item, pos):
