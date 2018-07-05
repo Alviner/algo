@@ -74,11 +74,11 @@ class OrderedList:
                 else:
                     go_next = False
 
-            if node is None:
+            if node is None:  # Дошли до конца списка
                 self.add_in_tail(item)
-            elif node.prev is None:
+            elif node.prev is None:  # Находимся на первом элементе
                 self.add_in_head(item)
-            else:
+            else:  # Вставка в середину
                 item.next = node
                 item.prev = node.prev
 
