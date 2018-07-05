@@ -63,30 +63,17 @@ class OrderedList:
         print()
 
     def add(self, item):  # O(n) ~ O(1)
+
         node = self.head
         go_next = True
-        if self.order == OrderedList.asc:
-            while node is not None and go_next:
-                if node <= item:
-                    node = node.next
-                else:
-                    go_next = False
-            if node is None:
-                self.add_in_tail(item)
-            elif node.prev is None:
-                self.add_in_head(item)
-            else:
-                item.next = node
-                item.prev = node.prev
 
-                node.prev.next = item
-                node.prev = item
-        elif self.order == OrderedList.desc:
+        if self.order in (OrderedList.asc, OrderedList.desc):
             while node is not None and go_next:
-                if node >= item:
+                if (node <= item and self.order == OrderedList.asc) or (node >= item and self.order == OrderedList.desc):
                     node = node.next
                 else:
                     go_next = False
+
             if node is None:
                 self.add_in_tail(item)
             elif node.prev is None:
@@ -129,17 +116,9 @@ class OrderedList:
         node = self.head
         temp = Node(item)
         go_next = True
-        if self.order == OrderedList.asc:
+        if self.order in (OrderedList.asc, OrderedList.desc):
             while node is not None and go_next:
-                if node >= temp:
-                    go_next = False
-                else:
-                    node = node.next
-            if node is not None:
-                return node if node == temp else None
-        elif self.order == OrderedList.desc:
-            while node is not None and go_next:
-                if node <= temp:
+                if (node >= temp and self.order == OrderedList.asc) or (node <= temp and self.order == OrderedList.desc):
                     go_next = False
                 else:
                     node = node.next
