@@ -75,9 +75,9 @@ class OrderedList:
                     go_next = False
 
             if node is None:  # Дошли до конца списка
-                self.add_in_tail(item)
+                self.__add_in_tail(item)
             elif node.prev is None:  # Находимся на первом элементе
-                self.add_in_head(item)
+                self.__add_in_head(item)
             else:  # Вставка в середину
                 item.next = node
                 item.prev = node.prev
@@ -85,9 +85,9 @@ class OrderedList:
                 node.prev.next = item
                 node.prev = item
         else:
-            self.add_in_tail(item)
+            self.__add_in_tail(item)
 
-    def add_in_tail(self, item):
+    def __add_in_tail(self, item):
         if self.head is None:
             self.head = item
             item.prev = None
@@ -97,7 +97,7 @@ class OrderedList:
             item.prev = self.tail
         self.tail = item
 
-    def add_in_head(self, item):
+    def __add_in_head(self, item):
         if self.tail is None:
             self.tail = item
             item.prev = None
@@ -151,13 +151,13 @@ def test_order_numbers():
     ol.add(Node(3))
     ol.add(Node(0))
     ol_test = OrderedList()
-    ol_test.add_in_tail(Node(0))
-    ol_test.add_in_tail(Node(1))
-    ol_test.add_in_tail(Node(2))
-    ol_test.add_in_tail(Node(3))
-    ol_test.add_in_tail(Node(4))
-    ol_test.add_in_tail(Node(5))
-    ol_test.add_in_tail(Node(7))
+    ol_test.__add_in_tail(Node(0))
+    ol_test.__add_in_tail(Node(1))
+    ol_test.__add_in_tail(Node(2))
+    ol_test.__add_in_tail(Node(3))
+    ol_test.__add_in_tail(Node(4))
+    ol_test.__add_in_tail(Node(5))
+    ol_test.__add_in_tail(Node(7))
 
     assert ol.size() == ol_test.size()
 
@@ -178,13 +178,13 @@ def test_order_numbers():
     ol.add(Node(3))
     ol.add(Node(0))
     ol_test = OrderedList()
-    ol_test.add_in_tail(Node(7))
-    ol_test.add_in_tail(Node(5))
-    ol_test.add_in_tail(Node(4))
-    ol_test.add_in_tail(Node(3))
-    ol_test.add_in_tail(Node(2))
-    ol_test.add_in_tail(Node(1))
-    ol_test.add_in_tail(Node(0))
+    ol_test.__add_in_tail(Node(7))
+    ol_test.__add_in_tail(Node(5))
+    ol_test.__add_in_tail(Node(4))
+    ol_test.__add_in_tail(Node(3))
+    ol_test.__add_in_tail(Node(2))
+    ol_test.__add_in_tail(Node(1))
+    ol_test.__add_in_tail(Node(0))
 
     assert ol.size() == ol_test.size()
 
@@ -207,13 +207,13 @@ def test_order_string():
     ol.add(NodeStr('3 '))
     ol.add(NodeStr(' 0'))
     ol_test = OrderedList()
-    ol_test.add_in_tail(NodeStr('0'))
-    ol_test.add_in_tail(NodeStr('1'))
-    ol_test.add_in_tail(NodeStr('2'))
-    ol_test.add_in_tail(NodeStr('3'))
-    ol_test.add_in_tail(NodeStr('4'))
-    ol_test.add_in_tail(NodeStr('5'))
-    ol_test.add_in_tail(NodeStr('7'))
+    ol_test.__add_in_tail(NodeStr('0'))
+    ol_test.__add_in_tail(NodeStr('1'))
+    ol_test.__add_in_tail(NodeStr('2'))
+    ol_test.__add_in_tail(NodeStr('3'))
+    ol_test.__add_in_tail(NodeStr('4'))
+    ol_test.__add_in_tail(NodeStr('5'))
+    ol_test.__add_in_tail(NodeStr('7'))
 
     assert ol.size() == ol_test.size()
 
@@ -234,13 +234,13 @@ def test_order_string():
     ol.add(NodeStr('3  '))
     ol.add(NodeStr('   0'))
     ol_test = OrderedList()
-    ol_test.add_in_tail(NodeStr('  7'))
-    ol_test.add_in_tail(NodeStr('5 '))
-    ol_test.add_in_tail(NodeStr(' 4'))
-    ol_test.add_in_tail(NodeStr('3 '))
-    ol_test.add_in_tail(NodeStr(' 2'))
-    ol_test.add_in_tail(NodeStr('1 '))
-    ol_test.add_in_tail(NodeStr(' 0'))
+    ol_test.__add_in_tail(NodeStr('  7'))
+    ol_test.__add_in_tail(NodeStr('5 '))
+    ol_test.__add_in_tail(NodeStr(' 4'))
+    ol_test.__add_in_tail(NodeStr('3 '))
+    ol_test.__add_in_tail(NodeStr(' 2'))
+    ol_test.__add_in_tail(NodeStr('1 '))
+    ol_test.__add_in_tail(NodeStr(' 0'))
 
     assert ol.size() == ol_test.size()
 
