@@ -15,7 +15,7 @@ class HashTable:
 
     def seek_slot(self, value):
         hash_key = self.hash_fun(value)
-        limit = self.step * self.size
+        limit = self.step * (self.size // self.step)
         while self.slots[hash_key] is not None and limit > 0:
             if self.slots[hash_key] is value:
                 break
@@ -28,7 +28,7 @@ class HashTable:
 
     def find(self, value):
         hash_key = self.hash_fun(value)
-        limit = self.step * self.size
+        limit = self.step * (self.size // self.step)
         while self.slots[hash_key] is not None and limit > 0:
             if self.slots[hash_key] is value:
                 return hash_key
