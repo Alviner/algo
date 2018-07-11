@@ -15,11 +15,12 @@ class HashTable:
 
     def seek_slot(self, value):
         hash_key = self.hash_fun(value)
-
-        while self.slots[hash_key] is not None:
+        limit = self.step
+        while self.slots[hash_key] is not None and limit > 0:
             if self.slots[hash_key] is value:
                 break
             hash_key = (hash_key + self.step) % self.size
+            limit -= 1
         return hash_key
 
     def put(self, value):
@@ -27,10 +28,12 @@ class HashTable:
 
     def find(self, value):
         hash_key = self.hash_fun(value)
-        while self.slots[hash_key] is not None:
+        limit = self.step
+        while self.slots[hash_key] is not None and limit > 0:
             if self.slots[hash_key] is value:
                 return hash_key
             hash_key = (hash_key + self.step) % self.size
+            limit -= 1
         return None
 
 
