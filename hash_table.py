@@ -21,10 +21,14 @@ class HashTable:
                 break
             hash_key = (hash_key + self.step) % self.size
             limit -= 1
+        if limit == 0:
+            return None
         return hash_key
 
     def put(self, value):
-        self.slots[self.seek_slot(value)] = value
+        hash_key = self.seek_slot(value)
+        if hash_key is not None:
+            self.slots[hash_key] = value
 
     def find(self, value):
         hash_key = self.hash_fun(value)
