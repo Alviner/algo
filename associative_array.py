@@ -23,7 +23,7 @@ class AssociativeArray:
     def is_key(self, key):
         hash_key = self.find(key)
         if hash_key is not None:
-            if self.slots[hash_key] is not None:
+            if self.slots[hash_key] == key:
                 return True
         return False
 
