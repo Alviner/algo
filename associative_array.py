@@ -21,7 +21,11 @@ class AssociativeArray:
             self.values[hash_key] = value
 
     def is_key(self, key):
-        return True if self.find(key) is not None else False
+        hash_key = self.find(key)
+        if hash_key is not None:
+            if self.slots[hash_key] is not None:
+                return True
+        return False
 
     def get(self, key):
         hash_key = self.find(key)
@@ -35,7 +39,7 @@ class AssociativeArray:
         limit = self.step * (self.size // self.step)
         while self.slots[hash_key] is not None and limit > 0:
             if self.slots[hash_key] is key:
-                break
+                return hash_key
             hash_key = (hash_key + self.step) % self.size
             limit -= 1
         if limit == 0:
@@ -43,14 +47,8 @@ class AssociativeArray:
         return hash_key
 
     def find(self, key):
-        hash_key = self._hash_fun(key)
-        limit = self.step * (self.size // self.step)
-        while self.slots[hash_key] is not None and limit > 0:
-            if self.slots[hash_key] is key:
-                return hash_key
-            hash_key = (hash_key + self.step) % self.size
-            limit -= 1
-        return None
+        hash_key = self._seek_slot(key)
+        return hash_key
 
 
 def test_hash_func():
