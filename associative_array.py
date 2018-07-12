@@ -30,8 +30,7 @@ class AssociativeArray:
     def get(self, key):
         hash_key = self.find(key)
         if hash_key is not None:
-            if self.slots[hash_key] is not None:
-                return self.values[hash_key]
+            return self.values[hash_key]
         return None
 
     def _seek_slot(self, key):
