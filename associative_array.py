@@ -15,8 +15,8 @@ class AssociativeArray:
         return res % self.size
 
     def put(self, key, value):
-        hash_key = self._seek_slot(key)
-        if hash_key is not None:
+        hash_key = self.find(key)
+        if self.slots[hash_key] is None:
             self.slots[hash_key] = key
             self.values[hash_key] = value
 
@@ -47,8 +47,7 @@ class AssociativeArray:
         return hash_key
 
     def find(self, key):
-        hash_key = self._seek_slot(key)
-        return hash_key
+        return self._seek_slot(key)
 
 
 def test_hash_func():
