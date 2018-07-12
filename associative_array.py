@@ -35,7 +35,7 @@ class AssociativeArray:
         limit = self.step * (self.size // self.step)
         while self.slots[hash_key] is not None and limit > 0:
             if self.slots[hash_key] is key:
-                return hash_key
+                break
             hash_key = (hash_key + self.step) % self.size
             limit -= 1
         if limit == 0:
