@@ -94,8 +94,11 @@ def test_put():
     ps.put('3')
     ps.put('1')
 
-    ps_test = ['1', '3', '2', '1']
-    ps_test = set(ps_test)
+    ps_test = set()
+    ps_test.add('1')
+    ps_test.add('2')
+    ps_test.add('3')
+    ps_test.add('1')
 
     length = 0
     for i in ps.slots:
@@ -115,8 +118,11 @@ def test_remove():
     ps.remove('3')
     ps.remove('2')
 
-    ps_test = ['1']
+    ps_test = ['1', '2', '3', '1']
     ps_test = set(ps_test)
+
+    ps_test.remove('3')
+    ps_test.remove('2')
 
     length = 0
     for i in ps.slots:
