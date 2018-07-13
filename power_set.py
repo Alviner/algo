@@ -20,37 +20,35 @@ class PowerSet(HashTable):
     def __init__(self, sz, stp):
         super(PowerSet, self).__init__(sz, stp)
 
+    @staticmethod
+    def __intersection(first, second):
+        res = PowerSet(min(first.size, second.size), min(first.step, second.step))
+
+        for item in first.slots:
+            if item is not None:
+                hash_key = second.find(item)
+                if hash_key is not None:
+                    if second.slots[hash_key] is item:
+                        res.put(item)
+        return res
+
     def put(self, value):
         hash_key = self.find(value)
         if hash_key is not None:
-            if self.slots[hash_key] is None:
-                self.slots[hash_key] = value
+            self.slots[hash_key] = value
 
     def remove(self, value):
         hash_key = self.find(value)
         if hash_key is not None:
-            if self.slots[hash_key] is not None:
-                self.slots[hash_key] = None
+            self.slots[hash_key] = None
 
     def intersection(self, set):
         shorter_self = True if self.size < set.size else False
 
-        res = PowerSet(min(self.size, set.size), min(self.step, set.step))
-
         if shorter_self:
-            for item in self.slots:
-                if item is not None:
-                    hash_key = set.find(item)
-                    if hash_key is not None:
-                        if set.slots[hash_key] is item:
-                            res.put(item)
+            res = self.__intersection(self, set)
         else:
-            for item in set.slots:
-                if item is not None:
-                    hash_key = self.find(item)
-                    if hash_key is not None:
-                        if self.slots[hash_key] is item:
-                            res.put(item)
+            res = self.__intersection(set, self)
         return res
 
     def union(self, set):
