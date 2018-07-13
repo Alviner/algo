@@ -221,7 +221,6 @@ def test_difference():
 
     ps_test = ps_test_first.difference(ps_test_second)
 
-
     length = 0
     for i in ps.slots:
         if i is not None:
