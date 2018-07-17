@@ -9,121 +9,124 @@ class TreeNode:
         self.value = value
         self.level = 1
 
-    def __iter__(self):
-        yield self
-        for node in self.left_child:
-            yield node
-        for node in self.right_child:
-            yield node
-
     def __repr__(self):
-        ret = ''
-        if self.left_child:
-            ret += self.left_child.__repr__()
-        ret += f" Node({self.value}) "
-        if self.right_child:
-            ret += self.right_child.__repr__()
-        return ret
-
-    def add(self, other):
-        if other < self.value:
-            if self.left_child is None:
-                self.left_child = TreeNode(other, self)
-                self.left_child.reload()
-            else:
-                self.left_child.add(other)
-        else:
-            if self.right_child is None:
-                self.right_child = TreeNode(other, self)
-                self.right_child.reload()
-            else:
-                self.right_child.add(other)
-
-    def reload(self):
-        if self.parent is None:
-            self.level = 1
-        else:
-            self.level = self.parent.level + 1
-
-    def find(self, value):
-        if value < self.value:
-            if self.left_child is None:
-                return self, False, 'left'
-            return self.left_child.find(value)
-        else:
-            if self.value == value:
-                return self, True, '-'
-
-            if self.right_child is None:
-                return self, False, 'right'
-            return self.right_child.find(value)
-
-    def remove(self, value):
-        if self.value > value:
-            self.left_child = self.left_child.remove(value)
-        elif self.value < value:
-            self.right_child = self.right_child.remove(value)
-        else:
-            if self.left_child is None:
-                return self.right_child
-            elif self.right_child is None:
-                return self.left_child
-
-            temp = self.right_child.find_minimum()
-            self.value = temp.value
-            self.right_child = self.right_child.remove(temp.value)
-        return self
-
-    def find_minimum(self):
-        if self.left_child is not None:
-            return self.left_child.find_minimum()
-        else:
-            return self
-
-    def find_maximum(self):
-        if self.right_child is not None:
-            return self.right_child.find_maximum()
-        else:
-            return self
+        return f' Node({self.value}) '
 
 
 class BinaryTree:
     def __init__(self, root=None):
         self.root = root
 
-    def __iter__(self):
-        return self.root.__iter__()
+    def __iter__(self, node=None):
+        if node is None:
+            node = self.root
+        yield node
+        for item in self.__iter__(node.left_child):
+            yield item
+        for item in self.__iter__(node.right_child):
+            yield item
 
-    def __repr__(self):
-        return self.root.__repr__()
+    def __repr__(self, node=None):
+        if node is None:
+            node = self.root
+        ret = ''
+        if node.left_child:
+            ret += self.__repr__(node.left_child)
+        ret += node.__repr__()
+        if node.right_child:
+            ret += self.__repr__(node.right_child)
+        return ret
+
+    def reload(self, node=None):
+        if node is None:
+            node = self.root
+        if node is None:
+            return
+        if node.parent is None:
+            node.level = 1
+        else:
+            node.level = node.level + 1
+        if node.left_child is not None:
+            self.reload(node.left_child)
+        if node.right_child is not None:
+            self.reload(node.right_child)
 
     def add(self, other):
         node, is_exist, pos = self.find(value=other)
         if not is_exist:
             if pos == 'right':
                 node.right_child = TreeNode(other, node)
+                self.reload(node.right_child)
             elif pos == 'left':
                 node.left_child = TreeNode(other, node)
+                self.reload(node.left_child)
             else:
                 self.root = TreeNode(other)
 
-    def find(self, value):
-        if self.root is not None:
-            return self.root.find(value)
+    def find(self, value, node=None):
+        if node is None:
+            node = self.root
+        if node is None:
+            return node, False, '-'
+        if value < node.value:
+            if node.left_child is None:
+                return node, False, 'left'
+            return self.find(value, node.left_child)
         else:
-            return None, False, '-'
+            if node.value == value:
+                return node, True, '-'
 
-    def remove(self, value):
-        if self.root is not None:
-            self.root.remove(value)
+            if node.right_child is None:
+                return node, False, 'right'
+            return self.find(value, node.right_child)
 
-    def find_minimum(self):
-        if self.root is not None:
-            return self.root.find_minimum()
+    def remove(self, value, node=None):
+        if node is None:
+            node = self.root
+        if node is None:
+            return
+        if node.value > value:
+            successor = self.remove(value, node.left_child)
+            if successor is not None:
+                successor.parent = node
+            node.left_child = successor
+        elif node.value < value:
+            successor = self.remove(value, node.right_child)
+            if successor is not None:
+                successor.parent = node
+            node.right_child = successor
+        else:
+            if node.left_child is None:
+                return node.right_child
+            elif node.right_child is None:
+                return node.left_child
 
-    def find_maximum(self):
-        if self.root is not None:
-            return self.root.find_maximum()
+            temp = self.find_minimum(node.right_child)
+            node.value = temp.value
+            successor = self.remove(temp.value, node.right_child)
+            successor.parent = node
+            node.right_child = successor
+        return node
+
+    def find_minimum(self, node=None):
+        if node is None:
+            node = self.root
+        if node is None:
+            return node
+        if node.left_child is not None:
+            return self.find_minimum(node.left_child)
+        else:
+            return node
+
+    def find_maximum(self, node=None):
+        if node is None:
+            node = self.root
+        if node is None:
+            return node
+        if node.right_child is not None:
+            return self.find_maximum(node.right_child)
+        else:
+            return node
 
 
 def test_find():
@@ -175,8 +178,8 @@ def test_minmax():
 
     assert tree.find_minimum().value == 2
     assert tree.find_maximum().value == 14
-    assert tree.root.right_child.find_minimum().value == 10
-    assert tree.root.left_child.find_maximum().value == 6
+    assert tree.find_minimum(tree.root.right_child).value == 10
+    assert tree.find_maximum(tree.root.left_child).value == 6
 
 
 def test_remove():
@@ -203,6 +206,8 @@ def test_remove():
     assert tree.root.right_child.value == 13
     tree.remove(1)
     assert tree.root.left_child.left_child.left_child is None
+    assert tree.root.left_child.parent is tree.root
+    assert tree.root.right_child.parent is tree.root
 
 
 if __name__ == '__main__':
