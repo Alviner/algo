@@ -39,52 +39,6 @@ class TreeNode:
             else:
                 self.right_child.add(other)
 
-    def remove(self, value):
-        node, is_exist, position = self.find(value)
-        if is_exist:
-            if self.value == node.value:
-                parent_node = self
-            else:
-                parent_node = node.parent
-
-            if node.left_child is None and node.right_child is None:
-                if value < parent_node.value:
-                    parent_node.left_child = None
-                else:
-                    parent_node.right_child = None
-                return
-
-            if node.left_child is not None and node.right_child is None:
-                if node.left_child.value < parent_node.value:
-                    parent_node.left_child = node.left_child
-                else:
-                    parent_node.right_child = node.left_child
-                return
-
-            if node.right_child is not None and node.left_child is None:
-                if node.value <= parent_node.value:
-                    parent_node.left_child = node.right_child
-                else:
-                    parent_node.right_child = node.right_child
-                return
-
-            if node.left_child is not None and node.right_child is not None:
-                min_node = self.find_minimum(node)
-                node.value = min_node.value
-                min_node.parent.left_child = None
-                return
-
-    def find_minimum(self, node):
-        if node.right_child is not None:
-            node = node.right_child
-        else:
-            return node
-
-        if node.left_child is not None:
-            return self.find_minimum(node=node.left_child)
-        else:
-            return node
-
     def reload(self):
         if self.parent is None:
             self.level = 1
@@ -104,6 +58,34 @@ class TreeNode:
                 return self, False, 'right'
             return self.right_child.find(value)
 
+    def remove(self, value):
+        if self.value > value:
+            self.left_child = self.left_child.remove(value)
+        elif self.value < value:
+            self.right_child = self.right_child.remove(value)
+        else:
+            if self.left_child is None:
+                return self.right_child
+            elif self.right_child is None:
+                return self.left_child
+
+            temp = self.right_child.find_minimum()
+            self.value = temp.value
+            self.right_child = self.right_child.remove(temp.value)
+        return self
+
+    def find_minimum(self):
+        if self.left_child is not None:
+            return self.left_child.find_minimum()
+        else:
+            return self
+
+    def find_maximum(self):
+        if self.right_child is not None:
+            return self.right_child.find_maximum()
+        else:
+            return self
+
 
 class BinaryTree:
     def __init__(self, root=None):
@@ -116,28 +98,115 @@ class BinaryTree:
         return self.root.__repr__()
 
     def add(self, other):
-        if self.root is None:
-            self.root = TreeNode(other)
-        else:
-            self.root.add(other)
+        node, is_exist, pos = self.find(value=other)
+        if not is_exist:
+            if pos == 'right':
+                node.right_child = TreeNode(other, node)
+            elif pos == 'left':
+                node.left_child = TreeNode(other, node)
+            else:
+                self.root = TreeNode(other)
 
     def find(self, value):
         if self.root is not None:
             return self.root.find(value)
+        else:
+            return None, False, '-'
 
     def remove(self, value):
         if self.root is not None:
             self.root.remove(value)
 
+    def find_minimum(self):
+        if self.root is not None:
+            return self.root.find_minimum()
 
-if __name__ == '__main__':
+    def find_maximum(self):
+        if self.root is not None:
+            return self.root.find_maximum()
+
+
+def test_find():
     tree = BinaryTree()
     tree.add(8)
     tree.add(4)
     tree.add(12)
     tree.add(2)
     tree.add(6)
-    print(tree)
+    tree.add(10)
+    tree.add(14)
+
+    node, is_exist, pos = tree.find(8)
+    assert node == tree.root and is_exist and pos == '-'
+
+    node, is_exist, pos = tree.find(2)
+    assert node == tree.root.left_child.left_child and is_exist and pos == '-'
+
+    node, is_exist, pos = tree.find(3)
+    assert node == tree.root.left_child.left_child and not is_exist and pos == 'right'
+
+
+def test_add():
+    tree = BinaryTree()
+    tree.add(8)
+    tree.add(4)
+    tree.add(12)
+    tree.add(2)
+    tree.add(6)
+    tree.add(10)
+    tree.add(14)
+
+    assert tree.root.value == 8
+    assert tree.root.left_child.value == 4
+    assert tree.root.right_child.value == 12
+    assert tree.root.left_child.left_child.value == 2
+    assert tree.root.left_child.right_child.value == 6
+
+
+def test_minmax():
+    tree = BinaryTree()
+    tree.add(8)
+    tree.add(4)
+    tree.add(12)
+    tree.add(2)
+    tree.add(6)
+    tree.add(10)
+    tree.add(14)
+
+    assert tree.find_minimum().value == 2
+    assert tree.find_maximum().value == 14
+    assert tree.root.right_child.find_minimum().value == 10
+    assert tree.root.left_child.find_maximum().value == 6
+
+
+def test_remove():
+    tree = BinaryTree()
+    tree.add(8)
+    tree.add(4)
+    tree.add(12)
+    tree.add(2)
+    tree.add(6)
+    tree.add(10)
+    tree.add(14)
+    tree.add(1)
+    tree.add(3)
+    tree.add(5)
+    tree.add(7)
+    tree.add(9)
+    tree.add(11)
+    tree.add(13)
+    tree.add(15)
 
     tree.remove(8)
-    print(tree)
+    assert tree.root.value == 9
+    tree.remove(12)
+    assert tree.root.right_child.value == 13
+    tree.remove(1)
+    assert tree.root.left_child.left_child.left_child is None
+
+
+if __name__ == '__main__':
+    test_find()
+    test_add()
+    test_minmax()
+    test_remove()
