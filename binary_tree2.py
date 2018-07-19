@@ -36,7 +36,7 @@ class BinaryTree:
                 pos = right_child
 
 
-def test_add():
+def test_tree():
     tree = BinaryTree()
     tree.add(50)
     tree.add(75)
@@ -77,6 +77,6 @@ def test_add():
 
 
 if __name__ == '__main__':
-    test_add()
+    test_tree()
 
 
