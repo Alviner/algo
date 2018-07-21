@@ -38,7 +38,7 @@ class Heap:
         return self.values[self._get_parent(index)]
 
     def add(self, value):
-        self.values.insert(len(self.values), value)
+        self.values.append(value)
         self.heap_up()
 
     def pop(self):
