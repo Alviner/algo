@@ -6,7 +6,7 @@ class Vertex:
 
 
 class SimpleGraph:
-    def __init__(self, max_vertex):
+    def __init__(self, max_vertex=0):
         self.max_vertex = max_vertex
         self.m_adjency = [[0 for x in range(self.max_vertex)] for y in range(self.max_vertex)]
         self.vertex = [Vertex() for x in range(self.max_vertex)]
