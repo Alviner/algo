@@ -6,10 +6,12 @@ class Vertex:
 
 
 class SimpleGraph:
+    vertex_class = Vertex
+
     def __init__(self, max_vertex=0):
         self.max_vertex = max_vertex
         self.m_adjency = [[0 for x in range(self.max_vertex)] for y in range(self.max_vertex)]
-        self.vertex = [Vertex() for x in range(self.max_vertex)]
+        self.vertex = [SimpleGraph.vertex_class() for x in range(self.max_vertex)]
 
     def __repr__(self):
         res = ''
@@ -20,19 +22,21 @@ class SimpleGraph:
     def _get_index(self, vertex):
         return self.vertex.index(vertex)
 
-    def add_rib(self, vertex_first, vertex_second):
+    def add_rib(self, vertex_first, vertex_second, single=False):
         index_first = self._get_index(vertex_first)
         index_second = self._get_index(vertex_second)
 
         self.m_adjency[index_first][index_second] = 1
-        self.m_adjency[index_second][index_first] = 1
+        if not single:
+            self.m_adjency[index_second][index_first] = 1
 
-    def remove_rib(self, vertex_first, vertex_second):
+    def remove_rib(self, vertex_first, vertex_second, single=False):
         index_first = self._get_index(vertex_first)
         index_second = self._get_index(vertex_second)
 
         self.m_adjency[index_first][index_second] = 0
-        self.m_adjency[index_second][index_first] = 0
+        if not single:
+            self.m_adjency[index_second][index_first] = 0
 
     def add_vertex(self, vertex):
         self.vertex.append(vertex)

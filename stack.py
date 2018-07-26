@@ -13,10 +13,10 @@ class Stack:
     def pop(self):  # O(n) когда работаем с головой списка, O(1) когда работали с хвостом
         if self.size() == 0:
             return None
-        return self.stack.pop(0)
+        return self.stack.pop()
 
     def push(self, item):  # O(n)
-        return self.stack.insert(0, item)
+        return self.stack.append(item)
 
     def peak(self):
         if self.size() == 0:
