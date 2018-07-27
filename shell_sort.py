@@ -3,11 +3,11 @@
 from sort import pred_insertion_sort
 
 
-def knuth_set(i):
+def knuth_number(i):
     if i == 0:
         return 1
     else:
-        return 3 * knuth_set(i - 1) + 1
+        return 3 * knuth_number(i - 1) + 1
 
 
 def shell_sort(items: list):
@@ -18,10 +18,10 @@ def shell_sort(items: list):
 
     i = 0
     knuth_list = []
-    knuth_list.append(knuth_set(i))
+    knuth_list.append(knuth_number(i))
     while knuth_list[i] < len(res):
         i += 1
-        knuth_list.append(knuth_set(i))
+        knuth_list.append(knuth_number(i))
 
     for it in reversed(knuth_list):
         res = pred_insertion_sort(res, it)
