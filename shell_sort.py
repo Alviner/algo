@@ -22,8 +22,7 @@ def shell_sort(items: list):
     while knuth_list[i] < len(res):
         i += 1
         knuth_list.append(knuth_number(i))
-
-    for it in reversed(knuth_list):
+    for it in reversed(knuth_list[:-1]):
         res = pred_insertion_sort(res, it)
     return res
 
