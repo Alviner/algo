@@ -62,11 +62,10 @@ class Graph(simple_graph.SimpleGraph):
                 self.stack.__init__()
                 return self.stack
 
-            try:
-                adjacent.index(second_vertex)
+            if second_vertex in adjacent:
                 self.stack.push(second_vertex)
                 current_vertex = None
-            except ValueError:
+            else:
                 for i, vertex in enumerate(adjacent):
                     if not vertex.is_visited():
                         current_vertex = vertex
