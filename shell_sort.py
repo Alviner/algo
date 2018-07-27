@@ -17,13 +17,14 @@ def shell_sort(items: list):
     res = items.copy()
 
     i = 0
-    step = knuth_set(i)
-    while step < len(res):
+    knuth_list = []
+    knuth_list.append(knuth_set(i))
+    while knuth_list[i] < len(res):
         i += 1
-        step = knuth_set(i)
+        knuth_list.append(knuth_set(i))
 
-    for it in reversed(range(i)):
-        res = pred_insertion_sort(res, knuth_set(it))
+    for it in reversed(knuth_list):
+        res = pred_insertion_sort(res, it)
     return res
 
 
