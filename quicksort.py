@@ -39,8 +39,6 @@ def _part_quicksort(items: list, pivot):
                 return end
             else:
                 return end + 1
-        if second_index == start:
-            return start
 
         if first_index == second_index:
             break
