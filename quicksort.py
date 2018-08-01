@@ -13,36 +13,22 @@ def _part_quicksort(items: list, left: int, right: int):
     first_index = left
     second_index = right
 
-    pivot_index = second_index
-    pivot = items[pivot_index]
-    pivots = 0
-
     while first_index != second_index:
-        while items[first_index] < pivot and first_index < second_index:
+        while items[first_index] < items[right] and first_index < second_index:
             first_index += 1
-        while items[second_index] >= pivot and first_index < second_index:
-            if items[second_index] == pivot:
-                pivots += 1
+        while items[second_index] >= items[right] and first_index < second_index:
             second_index -= 1
-
-        if first_index == right:
-            if items[first_index] > pivot:
-                return right, pivots
-            else:
-                return right + 1, pivots
 
         if first_index != second_index:
             _swap(items, first_index, second_index)
-    _swap(items, pivot_index, first_index)
-    return first_index, pivots + 1
+    _swap(items, right, first_index)
+    return first_index, items[first_index: right + 1].count(items[first_index])
 
 
 def quicksort(items, left: int, right: int):
-    if right - left > 1:
+    if right - left >= 1:
         sep, pivots = _part_quicksort(items, left, right)
-
-        if sep - 1 > left + 1:
-            quicksort(items, left, sep - 1)
+        quicksort(items, left, sep - 1)
         if sep + pivots < right + 1:
             quicksort(items, sep + 1, right)
 
@@ -80,7 +66,7 @@ def test_part_quicksort():
 def test_quicksort():
     items = []
 
-    for i in range(0, 100000):
+    for i in range(0, 10000):
         items.append(random.randint(1, 100))
 
     quicksort(items, 0, len(items) - 1)
