@@ -90,7 +90,7 @@ def test_quicksort():
 def test_shell_quicksort():
     quicksort_items = []
     shellsort_items = []
-    # random.seed(42)
+    random.seed(42)
     for i in range(0, 10000):
         quicksort_items.append(random.randint(1, 100))
         shellsort_items = quicksort_items.copy()
