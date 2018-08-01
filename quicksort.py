@@ -85,7 +85,7 @@ def test_shell_quicksort():
     end_quicksort = time.time()
 
     start_shellsort = time.time()
-    shellsort_items = shell_sort(shellsort_items)
+    shell_sort(shellsort_items)
     end_shellsort = time.time()
 
     assert is_sorted(quicksort_items)
@@ -96,6 +96,6 @@ def test_shell_quicksort():
 
 
 if __name__ == '__main__':
-    test_part_quicksort()
-    test_quicksort()
+    # test_part_quicksort()
+    # test_quicksort()
     test_shell_quicksort()

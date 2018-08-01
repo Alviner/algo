@@ -57,14 +57,12 @@ def bubble_sort(items: list):
 def pred_insertion_sort(items: list, step=1):
     if len(items) < 2:
         return items
-    res = items.copy()
     it = step
 
     while it >= 0:
         for i in range(step):
-            res[step - i - 1::step] = insertion_sort(res[step - i - 1::step])
+            items[step - i - 1::step] = insertion_sort(items[step - i - 1::step])
         it -= 1
-    return res
 
 
 def test_sort():
@@ -94,14 +92,14 @@ def test_sort():
     sort = [7, 6, 5, 4, 3, 2, 1]
     test_sort = [1, 3, 2, 4, 6, 5, 7]
 
-    sort = pred_insertion_sort(sort, 3)
+    pred_insertion_sort(sort, 3)
     for i, i_test in zip(sort, test_sort):
         assert i == i_test
 
     sort = [7, 6, 5, 4, 3, 2, 1]
     test_sort = [1, 2, 3, 4, 5, 6, 7]
 
-    sort = pred_insertion_sort(sort)
+    pred_insertion_sort(sort)
 
     for i, i_test in zip(sort, test_sort):
         assert i == i_test
