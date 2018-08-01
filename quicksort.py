@@ -57,7 +57,7 @@ def test_part_quicksort():
         3,
         4
     ]
-    sep = _part_quicksort(items, 0, len(items) - 1)
+    sep, pivots = _part_quicksort(items, 0, len(items) - 1)
 
     test_before = []
     test_after = items.copy()
