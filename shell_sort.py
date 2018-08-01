@@ -3,6 +3,13 @@
 from sort import pred_insertion_sort
 
 
+def is_sorted(items: list):
+    for i in range(0, len(items) - 2):
+        if items[i] > items[i + 1]:
+            return False
+    return True
+
+
 def shell_sort(items: list):
     if len(items) < 2:
         return items
@@ -16,6 +23,8 @@ def shell_sort(items: list):
         i += 1
         knuth_list.append(3 * knuth_list[i - 1] + 1)
     for it in reversed(knuth_list[:-1]):
+        if is_sorted(res):
+            break
         res = pred_insertion_sort(res, it)
     return res
 

@@ -1,49 +1,47 @@
 # -*- coding: utf-8 -*-
 
+import random
+from shell_sort import shell_sort, is_sorted
+import time
+
 
 def _swap(items: list, first_index: int, second_index: int):
     items[first_index], items[second_index] = items[second_index], items[first_index]
 
 
-def _get_pivot(items: list):
-    first_index = 0
-    second_index = len(items) - 1
-    res = items.copy()
+def _part_quicksort(items: list, left: int, right: int):
+    first_index = left
+    second_index = right
 
-    medium = int((first_index + second_index) / 2)
-    if res[medium] < res[first_index]:
-        _swap(res, first_index, medium)
-    if res[second_index] < res[first_index]:
-        _swap(res, first_index, second_index)
-    if res[second_index] < res[medium]:
-        _swap(res, second_index, medium)
-    _swap(res, second_index, medium)
+    pivot_index = second_index
+    pivot = items[pivot_index]
 
-    return res[second_index]
-
-
-def _part_quicksort(items: list, pivot):
-    start = 0
-    end = len(items) - 1
-    first_index = start
-    second_index = end
-
-    while True:
-        while items[first_index] <= pivot and first_index < second_index:
+    while first_index != second_index:
+        while items[first_index] < pivot and first_index < second_index:
             first_index += 1
-        while items[second_index] > pivot and first_index < second_index:
+        while items[second_index] >= pivot and first_index < second_index:
             second_index -= 1
 
-        if first_index == end:
+        if first_index == right:
             if items[first_index] > pivot:
-                return end
+                return right
             else:
-                return end + 1
+                return right + 1
 
-        if first_index == second_index:
-            break
-        _swap(items, first_index, second_index)
+        if first_index != second_index:
+            _swap(items, first_index, second_index)
+    _swap(items, pivot_index, first_index)
     return first_index
+
+
+def quicksort(items, left: int, right: int):
+    if right - left > 1:
+        sep = _part_quicksort(items, left, right)
+
+        if sep - 1 > left + 1:
+            quicksort(items, left, sep - 1)
+        if sep + 1 < right + 1:
+            quicksort(items, sep + 1, right)
 
 
 def test_part_quicksort():
@@ -56,8 +54,7 @@ def test_part_quicksort():
         3,
         4
     ]
-    pivot = -1
-    sep = _part_quicksort(items, pivot)
+    sep = _part_quicksort(items, 0, len(items) - 1)
 
     test_before = []
     test_after = items.copy()
@@ -76,202 +73,41 @@ def test_part_quicksort():
     for i, i_test in zip(after, test_after):
         assert i, i_test
 
-    # __________________________________________
-    pivot = 8
-    sep = _part_quicksort(items, pivot)
 
-    test_before = items.copy()
-    test_after = []
+def test_quicksort():
+    items = []
 
-    test_before.sort()
-    test_after.sort()
+    for i in range(0, 10000):
+        items.append(random.randint(1, 100))
 
-    before = items[:sep].copy()
-    after = items[sep:].copy()
-    before.sort()
-    after.sort()
+    quicksort(items, 0, len(items) - 1)
+    assert is_sorted(items)
 
-    for i, i_test in zip(before, test_before):
-        assert i, i_test
 
-    for i, i_test in zip(after, test_after):
-        assert i, i_test
+def test_shell_quicksort():
+    quicksort_items = []
+    shellsort_items = []
+    # random.seed(42)
+    for i in range(0, 20000):
+        quicksort_items.append(random.randint(1, 100))
+        shellsort_items = quicksort_items.copy()
 
-    # __________________________________________
-    pivot = 1
-    sep = _part_quicksort(items, pivot)
+    start_quicksort = time.time()
+    quicksort(quicksort_items, 0, len(quicksort_items) - 1)
+    end_quicksort = time.time()
 
-    test_before = [1]
-    test_after = items.copy()
+    start_shellsort = time.time()
+    shellsort_items = shell_sort(shellsort_items)
+    end_shellsort = time.time()
 
-    for item in test_before:
-        if item in test_after:
-            del test_before[test_before.index(item)]
+    assert is_sorted(quicksort_items)
+    assert is_sorted(shellsort_items)
 
-    test_before.sort()
-    test_after.sort()
-
-    before = items[:sep].copy()
-    after = items[sep:].copy()
-    before.sort()
-    after.sort()
-
-    for i, i_test in zip(before, test_before):
-        assert i, i_test
-
-    for i, i_test in zip(after, test_after):
-        assert i, i_test
-
-    # __________________________________________
-    pivot = 2
-    sep = _part_quicksort(items, pivot)
-
-    test_before = [1, 2]
-    test_after = items.copy()
-
-    for item in test_before:
-        if item in test_after:
-            del test_before[test_before.index(item)]
-
-    test_before.sort()
-    test_after.sort()
-
-    before = items[:sep].copy()
-    after = items[sep:].copy()
-    before.sort()
-    after.sort()
-
-    for i, i_test in zip(before, test_before):
-        assert i, i_test
-
-    for i, i_test in zip(after, test_after):
-        assert i, i_test
-
-    # __________________________________________
-    pivot = 3
-    sep = _part_quicksort(items, pivot)
-
-    test_before = [1, 2, 3]
-    test_after = items.copy()
-
-    for item in test_before:
-        if item in test_after:
-            del test_before[test_before.index(item)]
-
-    test_before.sort()
-    test_after.sort()
-
-    before = items[:sep].copy()
-    after = items[sep:].copy()
-    before.sort()
-    after.sort()
-
-    for i, i_test in zip(before, test_before):
-        assert i, i_test
-
-    for i, i_test in zip(after, test_after):
-        assert i, i_test
-
-    # __________________________________________
-    pivot = 4
-    sep = _part_quicksort(items, pivot)
-
-    test_before = [1, 2, 3, 4]
-    test_after = items.copy()
-
-    for item in test_before:
-        if item in test_after:
-            del test_before[test_before.index(item)]
-
-    test_before.sort()
-    test_after.sort()
-
-    before = items[:sep].copy()
-    after = items[sep:].copy()
-    before.sort()
-    after.sort()
-
-    for i, i_test in zip(before, test_before):
-        assert i, i_test
-
-    for i, i_test in zip(after, test_after):
-        assert i, i_test
-
-    # __________________________________________
-    pivot = 5
-    sep = _part_quicksort(items, pivot)
-
-    test_before = [1, 2, 3, 4, 5]
-    test_after = items.copy()
-
-    for item in test_before:
-        if item in test_after:
-            del test_before[test_before.index(item)]
-
-    test_before.sort()
-    test_after.sort()
-
-    before = items[:sep].copy()
-    after = items[sep:].copy()
-    before.sort()
-    after.sort()
-
-    for i, i_test in zip(before, test_before):
-        assert i, i_test
-
-    for i, i_test in zip(after, test_after):
-        assert i, i_test
-
-    # __________________________________________
-    pivot = 6
-    sep = _part_quicksort(items, pivot)
-
-    test_before = [1, 2, 3, 4, 5, 6]
-    test_after = items.copy()
-
-    for item in test_before:
-        if item in test_after:
-            del test_before[test_before.index(item)]
-
-    test_before.sort()
-    test_after.sort()
-
-    before = items[:sep].copy()
-    after = items[sep:].copy()
-    before.sort()
-    after.sort()
-
-    for i, i_test in zip(before, test_before):
-        assert i, i_test
-
-    for i, i_test in zip(after, test_after):
-        assert i, i_test
-
-    # __________________________________________
-    pivot = 7
-    sep = _part_quicksort(items, pivot)
-
-    test_before = [1, 2, 3, 4, 5, 6, 7]
-    test_after = items.copy()
-
-    for item in test_before:
-        if item in test_after:
-            del test_before[test_before.index(item)]
-
-    test_before.sort()
-    test_after.sort()
-
-    before = items[:sep].copy()
-    after = items[sep:].copy()
-    before.sort()
-    after.sort()
-
-    for i, i_test in zip(before, test_before):
-        assert i, i_test
-
-    for i, i_test in zip(after, test_after):
-        assert i, i_test
+    print(f'Quicksort time: {end_quicksort - start_quicksort}')
+    print(f'Shellsort time: {end_shellsort - start_shellsort}')
 
 
 if __name__ == '__main__':
     test_part_quicksort()
+    test_quicksort()
+    test_shell_quicksort()
