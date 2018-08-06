@@ -35,13 +35,12 @@ class Ksort():
 def test_ksort():
     items = []
     alph = string.ascii_lowercase[0:8]
+    ksort = Ksort()
 
-    for i in range(10000):
+    for i in range(1000000):
         value = f'{alph[random.randint(0, 7)]}{random.randint(0, 9)}{random.randint(0, 9)}'
         items.append(value)
-    ksort = Ksort()
-    for item in items:
-        ksort.append(item)
+        ksort.append(value)
 
     start = time.time()
     ksort_items = ksort.sort()
