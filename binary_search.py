@@ -34,6 +34,7 @@ def test_binary_search():
     for i in range(100):
         assert binary_search(items, random.choice(items))
     assert not binary_search(items, -1)
+    assert not binary_search(items, 1000)
 
 
 if __name__ == '__main__':
