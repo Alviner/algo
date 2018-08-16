@@ -16,11 +16,12 @@ class ANode:
         self.token_type = self.__detect_tocken_type()
 
     def __detect_tocken_type(self):
-        if self.token_value in ('+', '-', '/' '*'):
+        if self.token_value in ('+', '-', '/', '*'):
             return TokenType.OPERATION
         elif self.token_value in ('(', ')'):
             return TokenType.BRACKET
-        return TokenType.NUMBER
+        else:
+            return TokenType.NUMBER
 
     def __repr__(self):
         return f'[{self.token_type.value}, {self.token_value}]'
