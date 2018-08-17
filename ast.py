@@ -44,8 +44,11 @@ class AST(Stack):
     @staticmethod
     def __recover_brackets(expression: str, rec=0):
         res = expression
-        operations_first = ('*', '/')
-        operations_second = ('+', '-')
+        operations_priority = (
+            ('/', '*'),
+            ('-', '+')
+        )
+        operations_list = [item for sublist in operations_priority for item in sublist]
         parts = []
         part = 0
         # раскладываем выражения в скобках в обратном порядке - с большой глубины к меньшей
@@ -61,13 +64,13 @@ class AST(Stack):
         # востанавливаем скобки в каждой из частей
         for part_item in parts:
             part_item['part'] = AST.__recover_brackets(part_item['part'])
-        for operations in (operations_first, operations_second):
+        for operations in operations_priority:
             sort_operations = []
             # определяем порядок операций слева направо
-            for operation in operations:
-                if res.find(operation) > 0:
-                    sort_operations.append({'operation': operation, 'sort': res.find(operation)})
-            operations = [x['operation'] for x in sorted(sort_operations, key=lambda k: k['sort'])]
+            # for operation in operations:
+            #     if res.find(operation) > 0:
+            #         sort_operations.append({'operation': operation, 'sort': res.find(operation)})
+            # operations = [x['operation'] for x in sorted(sort_operations, key=lambda k: k['sort'])]
             
             for operation in operations:
                 index = res.find(operation)
@@ -75,11 +78,11 @@ class AST(Stack):
                     i = index - 1
                     j = index + 1
                     # ищем слева следующий оператор
-                    while res[i] not in operations_first + operations_second and i > 1:
+                    while res[i] not in operations_list and i > 1:
                         i -= 1
                     is_last_i = False
                     # проверяем есть ли другие операторы в оставшейся строке
-                    for k in operations_first + operations_second:
+                    for k in operations_list:
                         if res[:index].find(k) < 0:
                             is_last_i = True
                         else:
@@ -92,11 +95,11 @@ class AST(Stack):
                         # иначе ставим после найденного оператора
                         i += 1
                     # ищем слева следующий оператор
-                    while res[j] not in operations_first + operations_second and j < len(res) - 1:
+                    while res[j] not in operations_list and j < len(res) - 1:
                         j += 1
                     is_last_j = False
                     # проверяем есть ли другие операторы в оставшейся строке
-                    for k in operations_first + operations_second:
+                    for k in operations_list:
                         if res[j:].find(k) < 0:
                             is_last_j = True
                         else:
@@ -127,7 +130,7 @@ def test_parser():
     print(ast.stack)
 
     ast = AST('7+3*5-2')
-    test_ast = AST('((7+(3*5))-2)')
+    test_ast = AST('(7+((3*5)-2))')
     assert ast.expression == test_ast.expression
     print(ast.stack)
 
