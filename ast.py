@@ -2,6 +2,7 @@
 from enum import Enum
 
 from stack import Stack
+from simple_tree import SimpleTree, TreeNode
 
 
 class TokenType(Enum):
@@ -10,27 +11,33 @@ class TokenType(Enum):
     NUMBER = 'число'
 
 
-class ANode:
-    def __init__(self, value):
-        self.token_value = value
-        self.token_type = self.__detect_tocken_type()
+class ANode(TreeNode):
+    def __init__(self, value, parent=None, detect=True):
+        super(ANode, self).__init__(value, parent)
+        self.token_type = None
+        if detect:
+            self.token_type = self.detect_tocken_type()
 
-    def __detect_tocken_type(self):
-        if self.token_value in ('+', '-', '/', '*'):
+    def set(self, value):
+        self.value = value
+        self.token_type = self.detect_tocken_type()
+
+    def detect_tocken_type(self):
+        if self.value in ('+', '-', '/', '*'):
             return TokenType.OPERATION
-        elif self.token_value in ('(', ')'):
+        elif self.value in ('(', ')'):
             return TokenType.BRACKET
         else:
             return TokenType.NUMBER
 
     def __repr__(self):
-        return f'[{self.token_type.value}, {self.token_value}]'
+        return f'[{self.token_type.value}, {self.value}]'
 
 
-class AST(Stack):
+class AstStack(Stack):
     def __init__(self, expression: str):
-        super(AST, self).__init__()
-        self.expression = AST.__recover_brackets(expression)
+        super(AstStack, self).__init__()
+        self.expression = AstStack.__recover_brackets(expression)
         elem = ''
         for char in self.expression:
             if char in ('(', ')', '+', '-', '*', '/'):
@@ -63,14 +70,14 @@ class AST(Stack):
             index = res.rfind('(')
         # востанавливаем скобки в каждой из частей
         for part_item in parts:
-            part_item['part'] = AST.__recover_brackets(part_item['part'])
+            part_item['part'] = AstStack.__recover_brackets(part_item['part'])
         for operations in operations_priority:
             sort_operations = []
             # определяем порядок операций слева направо
-            # for operation in operations:
-            #     if res.find(operation) > 0:
-            #         sort_operations.append({'operation': operation, 'sort': res.find(operation)})
-            # operations = [x['operation'] for x in sorted(sort_operations, key=lambda k: k['sort'])]
+            for operation in operations:
+                if res.find(operation) > 0:
+                    sort_operations.append({'operation': operation, 'sort': res.find(operation)})
+            operations = [x['operation'] for x in sorted(sort_operations, key=lambda k: k['sort'])]
             
             for operation in operations:
                 index = res.find(operation)
@@ -122,23 +129,81 @@ class AST(Stack):
         return res
 
 
+class Ast(SimpleTree):
+    def __init__(self, expression):
+        node = ANode(None, detect=False)
+        super(Ast, self).__init__(node)
+        self.token_list = AstStack(expression)
+        while self.token_list.size() > 0:
+            item = self.token_list.pop(0)
+            if item.token_type == TokenType.BRACKET:
+                if item.value == '(':
+                    new_node = ANode(None, detect=False)
+                    self.add(node, new_node)
+                    node = new_node
+                else:
+                    if node.parent is not None:
+                        node = node.parent
+                    else:
+                        assert node == self.root
+            if item.token_type == TokenType.NUMBER:
+                node.set(item.value)
+                node = node.parent
+            if item.token_type == TokenType.OPERATION:
+                node.set(item.value)
+                new_node = ANode(None, detect=False)
+                self.add(node, new_node)
+                node = new_node
+
+
 def test_parser():
-    ast = AST('7+3/25*(5-2)')
-    test_ast = AST('(7+((3/25)*(5-2)))')
-    assert ast.expression == test_ast.expression
+    ast_stack = AstStack('7+3/25*(5-2)')
+    test_ast_stack = AstStack('(7+((3/25)*(5-2)))')
+    assert ast_stack.expression == test_ast_stack.expression
 
-    print(ast.stack)
+    ast_stack = AstStack('7+3*5-2')
+    test_ast_stack = AstStack('((7+(3*5))-2)')
+    assert ast_stack.expression == test_ast_stack.expression
 
-    ast = AST('7+3*5-2')
-    test_ast = AST('(7+((3*5)-2))')
-    assert ast.expression == test_ast.expression
-    print(ast.stack)
+    ast_stack = AstStack('(7+3)*(5-2)')
+    test_ast_stack = AstStack('((7+3)*(5-2))')
+    assert ast_stack.expression == test_ast_stack.expression
 
-    ast = AST('(7+3)*(5-2)')
-    test_ast = AST('((7+3)*(5-2))')
-    assert ast.expression == test_ast.expression
-    print(ast.stack)
+
+def test_ast():
+    ast = Ast('7+3/25*(5-2)')
+    assert ast.root.value == '+'
+    assert ast.root.child[0].value == '7'
+    assert ast.root.child[1].value == '*'
+    assert ast.root.child[1].child[0].value == '/'
+    assert ast.root.child[1].child[0].child[0].value == '3'
+    assert ast.root.child[1].child[0].child[1].value == '25'
+    assert ast.root.child[1].child[1].value == '-'
+    assert ast.root.child[1].child[1].child[0].value == '5'
+    assert ast.root.child[1].child[1].child[1].value == '2'
+    assert ast.count() == (9, 5)
+
+    ast = Ast('(7+3)*(5-2)')
+    assert ast.root.value == '*'
+    assert ast.root.child[0].value == '+'
+    assert ast.root.child[0].child[0].value == '7'
+    assert ast.root.child[0].child[1].value == '3'
+    assert ast.root.child[1].value == '-'
+    assert ast.root.child[1].child[0].value == '5'
+    assert ast.root.child[1].child[1].value == '2'
+    assert ast.count() == (7, 4)
+
+    ast = Ast('7+((3*5)-2))')
+    assert ast.root.value == '+'
+    assert ast.root.child[0].value == '7'
+    assert ast.root.child[1].value == '-'
+    assert ast.root.child[1].child[0].value == '*'
+    assert ast.root.child[1].child[0].child[0].value == '3'
+    assert ast.root.child[1].child[0].child[1].value == '5'
+    assert ast.root.child[1].child[1].value == '2'
+    assert ast.count() == (7, 4)
 
 
 if __name__ == '__main__':
     test_parser()
+    test_ast()

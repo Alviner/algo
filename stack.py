@@ -10,10 +10,10 @@ class Stack:
     def __init__(self):
         self.stack = []
 
-    def pop(self):  # O(n) когда работаем с головой списка, O(1) когда работали с хвостом
+    def pop(self, index=None):  # O(n) когда работаем с головой списка, O(1) когда работали с хвостом
         if self.size() == 0:
             return None
-        return self.stack.pop()
+        return self.stack.pop(index)
 
     def push(self, item):  # O(n)
         return self.stack.append(item)
