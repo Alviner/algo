@@ -16,7 +16,6 @@ class ANode(TreeNode):
     def __init__(self, value, parent=None):
         super(ANode, self).__init__(value, parent)
         self.token_type = None
-        self.result = None
         self.expression = ''
         if value is not None:
             self.token_type = self.detect_tocken_type()
