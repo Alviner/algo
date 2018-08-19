@@ -164,21 +164,20 @@ class Ast(SimpleTree):
                 self.add(node, new_node)
                 node = new_node
 
-    def translate(self):
-        node = self.root
-        while node != self.root or node.token_type is not TokenType.NUMBER:
+    def translate(self, node=None):
+        if node is None:
+            node = self.root
+        if node != self.root or node.token_type is not TokenType.NUMBER:
             if node.child[0].token_type is TokenType.NUMBER and node.child[1].token_type is TokenType.NUMBER:
-                right = node.child[0].expression if node.child[0].expression != '' else node.child[0].value
-                left = node.child[1].expression if node.child[1].expression != '' else node.child[1].value
-                node.expression = f'({right}{node.value}{left})'
+                node.expression = f'({node.child[0].value}{node.value}{node.child[1].value})'
                 node.set(Ast._op_map[node.value](float(node.child[0].value), float(node.child[1].value)))
                 node.child = []
                 if node.parent is not None:
-                    node = node.parent
+                    self.translate(node.parent)
             elif node.child[0].token_type is TokenType.OPERATION:
-                node = node.child[0]
+                self.translate(node.child[0])
             elif node.child[1].token_type is TokenType.OPERATION:
-                node = node.child[1]
+                self.translate(node.child[1])
 
 
 def test_parser():
