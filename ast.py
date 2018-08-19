@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
-import operator
 
 from stack import Stack
-from simple_tree import SimpleTree, TreeNode
 
 
 class TokenType(Enum):
@@ -12,34 +10,27 @@ class TokenType(Enum):
     NUMBER = 'число'
 
 
-class ANode(TreeNode):
-    def __init__(self, value, parent=None):
-        super(ANode, self).__init__(value, parent)
-        self.token_type = None
-        self.expression = ''
-        if value is not None:
-            self.token_type = self.detect_tocken_type()
+class ANode:
+    def __init__(self, value):
+        self.token_value = value
+        self.token_type = self.__detect_tocken_type()
 
-    def set(self, value):
-        self.value = value
-        self.token_type = self.detect_tocken_type()
-
-    def detect_tocken_type(self):
-        if self.value in ('+', '-', '/', '*'):
+    def __detect_tocken_type(self):
+        if self.token_value in ('+', '-', '/', '*'):
             return TokenType.OPERATION
-        elif self.value in ('(', ')'):
+        elif self.token_value in ('(', ')'):
             return TokenType.BRACKET
         else:
             return TokenType.NUMBER
 
     def __repr__(self):
-        return f'[{self.token_type.value}, {self.value}]'
+        return f'[{self.token_type.value}, {self.token_value}]'
 
 
-class AstStack(Stack):
+class AST(Stack):
     def __init__(self, expression: str):
-        super(AstStack, self).__init__()
-        self.expression = AstStack.__recover_brackets(expression)
+        super(AST, self).__init__()
+        self.expression = AST.__recover_brackets(expression)
         elem = ''
         for char in self.expression:
             if char in ('(', ')', '+', '-', '*', '/'):
@@ -53,11 +44,8 @@ class AstStack(Stack):
     @staticmethod
     def __recover_brackets(expression: str, rec=0):
         res = expression
-        operations_priority = (
-            ('/', '*'),
-            ('-', '+')
-        )
-        operations_list = [item for sublist in operations_priority for item in sublist]
+        operations_first = ('*', '/')
+        operations_second = ('+', '-')
         parts = []
         part = 0
         # раскладываем выражения в скобках в обратном порядке - с большой глубины к меньшей
@@ -72,8 +60,8 @@ class AstStack(Stack):
             index = res.rfind('(')
         # востанавливаем скобки в каждой из частей
         for part_item in parts:
-            part_item['part'] = AstStack.__recover_brackets(part_item['part'])
-        for operations in operations_priority:
+            part_item['part'] = AST.__recover_brackets(part_item['part'])
+        for operations in (operations_first, operations_second):
             sort_operations = []
             # определяем порядок операций слева направо
             for operation in operations:
@@ -87,11 +75,11 @@ class AstStack(Stack):
                     i = index - 1
                     j = index + 1
                     # ищем слева следующий оператор
-                    while res[i] not in operations_list and i > 1:
+                    while res[i] not in operations_first + operations_second and i > 1:
                         i -= 1
                     is_last_i = False
                     # проверяем есть ли другие операторы в оставшейся строке
-                    for k in operations_list:
+                    for k in operations_first + operations_second:
                         if res[:index].find(k) < 0:
                             is_last_i = True
                         else:
@@ -104,11 +92,11 @@ class AstStack(Stack):
                         # иначе ставим после найденного оператора
                         i += 1
                     # ищем слева следующий оператор
-                    while res[j] not in operations_list and j < len(res) - 1:
+                    while res[j] not in operations_first + operations_second and j < len(res) - 1:
                         j += 1
                     is_last_j = False
                     # проверяем есть ли другие операторы в оставшейся строке
-                    for k in operations_list:
+                    for k in operations_first + operations_second:
                         if res[j:].find(k) < 0:
                             is_last_j = True
                         else:
@@ -131,122 +119,23 @@ class AstStack(Stack):
         return res
 
 
-class Ast(SimpleTree):
-    _op_map = {
-        '+': operator.add,
-        '-': operator.sub,
-        '*': operator.mul,
-        '/': operator.truediv
-    }
-
-    def __init__(self, expression):
-        node = ANode(None)
-        super(Ast, self).__init__(node)
-        self.token_list = AstStack(expression)
-        while self.token_list.size() > 0:
-            item = self.token_list.pop(0)
-            if item.token_type is TokenType.BRACKET:
-                if item.value == '(':
-                    new_node = ANode(None)
-                    self.add(node, new_node)
-                    node = new_node
-                else:
-                    if node.parent is not None:
-                        node = node.parent
-                    else:
-                        assert node == self.root
-            if item.token_type is TokenType.NUMBER:
-                node.set(item.value)
-                node = node.parent
-            if item.token_type is TokenType.OPERATION:
-                node.set(item.value)
-                new_node = ANode(None)
-                self.add(node, new_node)
-                node = new_node
-
-    def interpret(self, node=None):
-        if node is None:
-            node = self.root
-        if node != self.root or node.token_type is not TokenType.NUMBER:
-            if node.child[0].token_type is TokenType.NUMBER and node.child[1].token_type is TokenType.NUMBER:
-                node.expression = f'({node.child[0].value}{node.value}{node.child[1].value})'
-                node.set(Ast._op_map[node.value](float(node.child[0].value), float(node.child[1].value)))
-                node.child = []
-                if node.parent is not None:
-                    self.interpret(node.parent)
-            elif node.child[0].token_type is TokenType.OPERATION:
-                self.interpret(node.child[0])
-            elif node.child[1].token_type is TokenType.OPERATION:
-                self.interpret(node.child[1])
-
-
 def test_parser():
-    ast_stack = AstStack('7+3/25*(5-2)')
-    test_ast_stack = AstStack('(7+((3/25)*(5-2)))')
-    assert ast_stack.expression == test_ast_stack.expression
+    ast = AST('7+3/25*(5-2)')
+    test_ast = AST('(7+((3/25)*(5-2)))')
+    assert ast.expression == test_ast.expression
 
-    ast_stack = AstStack('7+3*5-2')
-    test_ast_stack = AstStack('((7+(3*5))-2)')
-    assert ast_stack.expression == test_ast_stack.expression
+    print(ast.stack)
 
-    ast_stack = AstStack('(7+3)*(5-2)')
-    test_ast_stack = AstStack('((7+3)*(5-2))')
-    assert ast_stack.expression == test_ast_stack.expression
+    ast = AST('7+3*5-2')
+    test_ast = AST('((7+(3*5))-2)')
+    assert ast.expression == test_ast.expression
+    print(ast.stack)
 
-
-def test_ast():
-    ast = Ast('7+3/25*(5-2)')
-    assert ast.root.value == '+'
-    assert ast.root.child[0].value == '7'
-    assert ast.root.child[1].value == '*'
-    assert ast.root.child[1].child[0].value == '/'
-    assert ast.root.child[1].child[0].child[0].value == '3'
-    assert ast.root.child[1].child[0].child[1].value == '25'
-    assert ast.root.child[1].child[1].value == '-'
-    assert ast.root.child[1].child[1].child[0].value == '5'
-    assert ast.root.child[1].child[1].child[1].value == '2'
-    assert ast.count() == (9, 5)
-
-    ast = Ast('(7+3)*(5-2)')
-    assert ast.root.value == '*'
-    assert ast.root.child[0].value == '+'
-    assert ast.root.child[0].child[0].value == '7'
-    assert ast.root.child[0].child[1].value == '3'
-    assert ast.root.child[1].value == '-'
-    assert ast.root.child[1].child[0].value == '5'
-    assert ast.root.child[1].child[1].value == '2'
-    assert ast.count() == (7, 4)
-
-    ast = Ast('7+((3*5)-2)')
-    assert ast.root.value == '+'
-    assert ast.root.child[0].value == '7'
-    assert ast.root.child[1].value == '-'
-    assert ast.root.child[1].child[0].value == '*'
-    assert ast.root.child[1].child[0].child[0].value == '3'
-    assert ast.root.child[1].child[0].child[1].value == '5'
-    assert ast.root.child[1].child[1].value == '2'
-    assert ast.count() == (7, 4)
-
-
-def test_translate():
-    ast = Ast('5-20')
-    ast.interpret()
-    assert ast.root.value == 5-20
-
-    ast = Ast('7+3/25*(5-2)')
-    ast.interpret()
-    assert ast.root.value == 7+3/25*(5-2)
-
-    ast = Ast('(7+3)*(5-2)')
-    ast.interpret()
-    assert ast.root.value == (7+3)*(5-2)
-
-    ast = Ast('7+((3*5)-2)')
-    ast.interpret()
-    assert ast.root.value == 7+((3*5)-2)
+    ast = AST('(7+3)*(5-2*3)')
+    test_ast = AST('((7+3)*(5-(2*3)))')
+    assert ast.expression == test_ast.expression
+    print(ast.stack)
 
 
 if __name__ == '__main__':
     test_parser()
-    test_ast()
-    test_translate()
