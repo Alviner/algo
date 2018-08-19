@@ -164,7 +164,7 @@ class Ast(SimpleTree):
                 self.add(node, new_node)
                 node = new_node
 
-    def translate(self, node=None):
+    def interpret(self, node=None):
         if node is None:
             node = self.root
         if node != self.root or node.token_type is not TokenType.NUMBER:
@@ -173,11 +173,11 @@ class Ast(SimpleTree):
                 node.set(Ast._op_map[node.value](float(node.child[0].value), float(node.child[1].value)))
                 node.child = []
                 if node.parent is not None:
-                    self.translate(node.parent)
+                    self.interpret(node.parent)
             elif node.child[0].token_type is TokenType.OPERATION:
-                self.translate(node.child[0])
+                self.interpret(node.child[0])
             elif node.child[1].token_type is TokenType.OPERATION:
-                self.translate(node.child[1])
+                self.interpret(node.child[1])
 
 
 def test_parser():
@@ -230,19 +230,19 @@ def test_ast():
 
 def test_translate():
     ast = Ast('5-20')
-    ast.translate()
+    ast.interpret()
     assert ast.root.value == 5-20
 
     ast = Ast('7+3/25*(5-2)')
-    ast.translate()
+    ast.interpret()
     assert ast.root.value == 7+3/25*(5-2)
 
     ast = Ast('(7+3)*(5-2)')
-    ast.translate()
+    ast.interpret()
     assert ast.root.value == (7+3)*(5-2)
 
     ast = Ast('7+((3*5)-2)')
-    ast.translate()
+    ast.interpret()
     assert ast.root.value == 7+((3*5)-2)
 
 
