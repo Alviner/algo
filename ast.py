@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
+import operator
 
 from stack import Stack
 from simple_tree import SimpleTree, TreeNode
@@ -12,10 +13,12 @@ class TokenType(Enum):
 
 
 class ANode(TreeNode):
-    def __init__(self, value, parent=None, detect=True):
+    def __init__(self, value, parent=None):
         super(ANode, self).__init__(value, parent)
         self.token_type = None
-        if detect:
+        self.result = None
+        self.expression = ''
+        if value is not None:
             self.token_type = self.detect_tocken_type()
 
     def set(self, value):
@@ -130,15 +133,22 @@ class AstStack(Stack):
 
 
 class Ast(SimpleTree):
+    _op_map = {
+        '+': operator.add,
+        '-': operator.sub,
+        '*': operator.mul,
+        '/': operator.truediv
+    }
+
     def __init__(self, expression):
-        node = ANode(None, detect=False)
+        node = ANode(None)
         super(Ast, self).__init__(node)
         self.token_list = AstStack(expression)
         while self.token_list.size() > 0:
             item = self.token_list.pop(0)
-            if item.token_type == TokenType.BRACKET:
+            if item.token_type is TokenType.BRACKET:
                 if item.value == '(':
-                    new_node = ANode(None, detect=False)
+                    new_node = ANode(None)
                     self.add(node, new_node)
                     node = new_node
                 else:
@@ -146,14 +156,30 @@ class Ast(SimpleTree):
                         node = node.parent
                     else:
                         assert node == self.root
-            if item.token_type == TokenType.NUMBER:
+            if item.token_type is TokenType.NUMBER:
                 node.set(item.value)
                 node = node.parent
-            if item.token_type == TokenType.OPERATION:
+            if item.token_type is TokenType.OPERATION:
                 node.set(item.value)
-                new_node = ANode(None, detect=False)
+                new_node = ANode(None)
                 self.add(node, new_node)
                 node = new_node
+
+    def translate(self):
+        node = self.root
+        while node != self.root or node.token_type is not TokenType.NUMBER:
+            if node.child[0].token_type is TokenType.NUMBER and node.child[1].token_type is TokenType.NUMBER:
+                right = node.child[0].expression if node.child[0].expression != '' else node.child[0].value
+                left = node.child[1].expression if node.child[1].expression != '' else node.child[1].value
+                node.expression = f'({right}{node.value}{left})'
+                node.set(Ast._op_map[node.value](float(node.child[0].value), float(node.child[1].value)))
+                node.child = []
+                if node.parent is not None:
+                    node = node.parent
+            elif node.child[0].token_type is TokenType.OPERATION:
+                node = node.child[0]
+            elif node.child[1].token_type is TokenType.OPERATION:
+                node = node.child[1]
 
 
 def test_parser():
@@ -193,7 +219,7 @@ def test_ast():
     assert ast.root.child[1].child[1].value == '2'
     assert ast.count() == (7, 4)
 
-    ast = Ast('7+((3*5)-2))')
+    ast = Ast('7+((3*5)-2)')
     assert ast.root.value == '+'
     assert ast.root.child[0].value == '7'
     assert ast.root.child[1].value == '-'
@@ -204,6 +230,25 @@ def test_ast():
     assert ast.count() == (7, 4)
 
 
+def test_translate():
+    ast = Ast('5-20')
+    ast.translate()
+    assert ast.root.value == 5-20
+
+    ast = Ast('7+3/25*(5-2)')
+    ast.translate()
+    assert ast.root.value == 7+3/25*(5-2)
+
+    ast = Ast('(7+3)*(5-2)')
+    ast.translate()
+    assert ast.root.value == (7+3)*(5-2)
+
+    ast = Ast('7+((3*5)-2)')
+    ast.translate()
+    assert ast.root.value == 7+((3*5)-2)
+
+
 if __name__ == '__main__':
     test_parser()
     test_ast()
+    test_translate()
