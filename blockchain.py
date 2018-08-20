@@ -23,18 +23,22 @@ class Blockchain:
     def __init__(self, zeroes=3):
         self.chain = []
         self.zeroes = zeroes
+        self.need_nonce = zeroes > 0
         self.add_block('00000', 0)
 
     def hash(self, block: Block):
+        block_data = {'id': block.id,
+                      'time': block.time,
+                      'nonce': block.nonce,
+                      'hash_prev': block.hash_prev}
+        if not self.need_nonce:
+            del block_data['nonce']
         block_string = json.dumps(
-            {'id': block.id,
-             'time': block.time,
-             'nonce': block.nonce,
-             'hash_prev': block.hash_prev},
+            block_data,
             sort_keys=True).encode()
         return hashlib.md5(block_string).hexdigest()
 
-    def add_block(self, hash_prev, nonce):
+    def add_block(self, hash_prev, nonce=0):
         block = Block(idn=len(self.chain) + 1,
                       hash_prev=hash_prev,
                       nonce=nonce)
@@ -51,6 +55,8 @@ class Blockchain:
         return nonce
 
     def valid_proof(self, last_hash, nonce):
+        if not self.need_nonce:
+            return True
         guess = f'{last_hash}{nonce}'.encode()
         guess_hash = hashlib.md5(guess).hexdigest()
         return guess_hash[-self.zeroes:] == '0' * self.zeroes
