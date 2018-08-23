@@ -88,15 +88,17 @@ def test_predict():
             assert neuron.predict(neuron.get_data(file)) == 0
 
 
-def test_train():
+def test_train(output=False):
     neuron = Neuron(10, 10)
     neuron.train()
     results = neuron.test()
 
     for (expext, result) in results:
+        if output:
+            print(f'expexted: {expext}, predicted: {result}')
         assert expext == result
 
 
 if __name__ == '__main__':
     test_predict()
-    test_train()
+    test_train(output=True)
