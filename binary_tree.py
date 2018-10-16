@@ -10,7 +10,7 @@ class TreeNode:
         self.level = 1
 
     def __repr__(self):
-        return f' Node({self.value}) '
+        return f'Node({self.value})'
 
 
 class BinaryTree:
@@ -21,10 +21,12 @@ class BinaryTree:
         if node is None:
             node = self.root
         yield node
-        for item in self.__iter__(node.left_child):
-            yield item
-        for item in self.__iter__(node.right_child):
-            yield item
+        if node.left_child:
+            for item in self.__iter__(node.left_child):
+                yield item
+        if node.right_child:
+            for item in self.__iter__(node.right_child):
+                yield item
 
     def __repr__(self, node=None):
         if node is None:
@@ -45,23 +47,29 @@ class BinaryTree:
         if node.parent is None:
             node.level = 1
         else:
-            node.level = node.level + 1
+            node.level = node.parent.level + 1
         if node.left_child is not None:
             self.reload(node.left_child)
         if node.right_child is not None:
             self.reload(node.right_child)
 
-    def add(self, other):
-        node, is_exist, pos = self.find(value=other)
+    def add(self, other, node=None):
+        if node is not None:
+            is_exist, pos = False, 'right' if node.right_child is None else 'left'
+        else:
+            node, is_exist, pos = self.find(value=other)
         if not is_exist:
             if pos == 'right':
                 node.right_child = TreeNode(other, node)
                 self.reload(node.right_child)
+                return node.right_child
             elif pos == 'left':
                 node.left_child = TreeNode(other, node)
                 self.reload(node.left_child)
+                return node.left_child
             else:
                 self.root = TreeNode(other)
+                return self.root
 
     def find(self, value, node=None):
         if node is None:
