@@ -170,28 +170,28 @@ class BinaryWeldedTree:
 
         left_queue = Queue()
         right_queue = Queue()
-        self.bordered = {}
+        bordered = {}
 
         for connection in self.left_tree:
             if not (connection.node.left_connection and connection.node.right_connection):
                 left_queue.enqueue({'connection': connection, 'counts': 2})
-                self.bordered[connection] = []
+                bordered[connection] = []
 
         for connection in self.right_tree:
             if not (connection.node.left_connection and connection.node.right_connection):
                 right_queue.enqueue({'connection': connection, 'counts': 2})
-                self.bordered[connection] = []
+                bordered[connection] = []
 
         while left_queue.size() > 0 and right_queue.size() > 0:
             left_connection = left_queue.dequeue()
             right_connection = right_queue.dequeue()
 
-            while right_connection['connection'] in self.bordered[left_connection['connection']]:
+            while right_connection['connection'] in bordered[left_connection['connection']]:
                 right_queue.enqueue(right_connection)
                 right_connection = right_queue.dequeue()
 
-            self.bordered[left_connection['connection']].append(right_connection['connection'])
-            self.bordered[right_connection['connection']].append(left_connection['connection'])
+            bordered[left_connection['connection']].append(right_connection['connection'])
+            bordered[right_connection['connection']].append(left_connection['connection'])
 
             border_node = BorderNode(left_connection['connection'].node, right_connection['connection'].node)
 
@@ -247,4 +247,3 @@ if __name__ == '__main__':
     colors = list(Color)
     btw = BinaryWeldedTree(2, colors[:5])
     print(btw)
-    print(btw.bordered)
