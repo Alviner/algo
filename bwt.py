@@ -1,106 +1,236 @@
 # -*- coding: utf-8 -*-
 
 import random
-
-from binary_tree import BinaryTree
-from stack import Stack
+from enum import Enum
 from queue import Queue
 from termcolor import colored
 
 
-class BinaryWeldedTreeHalf(BinaryTree):
-    def __init__(self, depth: int, colors: int, is_reversed: bool, colors_list: list):
-        super(BinaryWeldedTreeHalf, self).__init__(root=None)
+class Color(Enum):
+    red = 'red'
+    grey = 'grey'
+    green = 'green'
+    yellow = 'yellow'
+    blue = 'blue'
+    magenta = 'magenta'
+
+
+class Node:
+    def __init__(self, parent=None, value=None):
+        self.parent = parent
+        self.left_connection = None
+        self.right_connection = None
+        self.value = value
+
+    def set_right_connection(self, node, color: Color):
+        node.parent = self
+        self.right_connection = Connection(node, color)
+
+        return self.right_connection
+
+    def set_left_connection(self, node, color: Color):
+        node.parent = self
+        self.left_connection = Connection(node, color)
+
+        return self.left_connection
+
+    def __repr__(self):
+        return f'Node({self.value})'
+
+
+class BorderNode:
+    def __init__(self, parent_left: Node, parent_right: Node):
+        self.parent_left = parent_left
+        self.parent_right = parent_right
+
+    def __repr__(self):
+        return ''
+
+
+class Connection:
+    def __init__(self, node, color: Color):
+        self.node = node
+        self.color = color
+
+    def __repr__(self):
+        return self.node.__repr__()
+
+    def get_used_colors(self):
+        colors = [self.color]
+        if self.node.left_connection:
+            colors.append(self.node.left_connection.color)
+        if self.node.right_connection:
+            colors.append(self.node.right_connection.color)
+        return set(colors)
+
+
+class BinaryTree:
+    def __init__(self, root: Connection = None, reversed=False, depth: int=0):
+        self.root = root
+        self.reversed = reversed
         self.depth = depth
-        self.colors = colors
-        self.reversed = is_reversed
-        color = 0
-        node = None
-        stack = Stack()
-        queue = Queue()
-        stack.push(self.add(colors_list[color]))
-        for i in range(self.depth):
-            while stack.size() > 0 or queue.size() % 2 != 0:
-                if not node:
-                    node = stack.pop(0)
-                if node.left_child and node.right_child:
-                    node = stack.pop(0)
-                choosen_colors = [node.value]
-                if node.right_child:
-                    choosen_colors.append(node.right_child.value)
-                if node.left_child:
-                    choosen_colors.append(node.left_child.value)
-                color = random.choice([c for c in range(self.colors) if colors_list[c] not in list(set(choosen_colors))])
-                queue.enqueue(self.add(colors_list[color], node))
-            while queue.size() > 0:
-                stack.push(queue.dequeue())
 
-    def __repr__(self, node=None):
+    def __iter__(self, connection=None):
+        if connection is None:
+            connection = self.root
+        yield connection
+        if connection.node.left_connection:
+            for item in self.__iter__(connection.node.left_connection):
+                yield item
+        if connection.node.right_connection:
+            for item in self.__iter__(connection.node.right_connection):
+                yield item
+
+    def __repr__(self, connection=None, level=1):
         ret = ''
-        if node is None:
-            node = self.root
+        if connection is None:
+            connection = self.root
         tab = '            '
-        if node.left_child:
-            ret += self.__repr__(node.left_child)
-        slide = 4 * self.depth - node.level if self.reversed else node.level
-        node_ret = f"{tab * (slide - 1)}{colored('--', node.value)}{colored(node.__repr__(), node.value)}\n"
+        node = connection.node
+        slide = 4 * self.depth - level if self.reversed else level
+        conn_ret = ''
+        if isinstance(node, Node):
+            if node.left_connection:
+                ret += self.__repr__(node.left_connection, level + 1)
+            if node.parent:
+                conn_ret += colored(f' {node.parent.value} ', connection.color.value)
+        else:
+            if self.reversed:
+                if node.parent_left:
+                    conn_ret += colored(f' {node.parent_left.value} ', connection.color.value)
+            else:
+                if node.parent_right:
+                    conn_ret += colored(f' {node.parent_right.value} ', connection.color.value)
+        conn_ret = conn_ret + connection.__repr__() if not self.reversed else connection.__repr__() + conn_ret
+        node_ret = f"{tab * (slide - 1)}{conn_ret}\n"
 
-        # ret += ' ' * len(node_ret) + colored('--', node.rvalue)
         ret += node_ret
-        # ret += ' ' * len(node_ret)
-        if node.right_child:
-            ret += self.__repr__(node.right_child)
+        if isinstance(node, Node):
+            if node.right_connection:
+                ret += self.__repr__(node.right_connection, level + 1)
         return ret
 
 
 class BinaryWeldedTree:
-    colors_list = ['grey', 'red', 'green', 'yellow', 'blue', 'magenta']
-
-    def __init__(self, depth: int, colors: int):
-        assert colors <= len(self.colors_list)
+    def __init__(self, depth: int, colors_list: list):
         self.depth = depth
-        self.colors = colors
-        self.left_side = BinaryWeldedTreeHalf(depth=self.depth, colors=colors,
-                                              is_reversed=False, colors_list=self.colors_list[:self.colors])
-        self.right_side = BinaryWeldedTreeHalf(depth=self.depth, colors=colors,
-                                               is_reversed=True, colors_list=self.colors_list[:self.colors])
+        self.colors = set(colors_list)
+        count = 0
+        self.right_tree = BinaryTree(Connection(Node(None, count), random.choice(colors_list)), True, self.depth)
+        count += 1
+        self.left_tree = BinaryTree(Connection(Node(None, count), random.choice(colors_list)), False, self.depth)
+        count += 1
+
+        queue_right = Queue()
+        queue_left = Queue()
+
+        queue_right.enqueue(self.right_tree.root)
+        queue_left.enqueue(self.left_tree.root)
+        for i in range(depth):
+            left_splice = []
+            right_splice = []
+            while queue_left.size() > 0:
+                connection = queue_left.dequeue()
+                node = connection.node
+                left_splice.append(node.set_right_connection(Node(node, count),
+                                                             random.choice(
+                                                                 list(self.colors.difference(
+                                                                     connection.get_used_colors()))
+                                                             ))
+                                   )
+                count += 1
+                left_splice.append(node.set_left_connection(Node(node, count),
+                                                            random.choice(
+                                                                list(self.colors.difference(
+                                                                    connection.get_used_colors()))
+                                                            ))
+                                   )
+                count += 1
+            while queue_right.size() > 0:
+                connection = queue_right.dequeue()
+                node = connection.node
+                right_splice.append(node.set_right_connection(Node(node, count),
+                                                              random.choice(
+                                                                  list(self.colors.difference(
+                                                                      connection.get_used_colors()))
+                                                              ))
+                                    )
+                count += 1
+                right_splice.append(node.set_left_connection(Node(node, count),
+                                                             random.choice(
+                                                                 list(self.colors.difference(
+                                                                     connection.get_used_colors()))
+                                                             ))
+                                    )
+                count += 1
+            while len(left_splice) > 0:
+                queue_left.enqueue(left_splice.pop())
+            while len(right_splice) > 0:
+                queue_right.enqueue(right_splice.pop())
 
         left_queue = Queue()
         right_queue = Queue()
-        self.parts_connections = {}
+        self.bordered = {}
 
-        for node in self.left_side:
-            if not node.left_child and not node.right_child:
-                left_queue.enqueue({'node': node, 'connections': 2})
-                self.parts_connections[node] = []
+        for connection in self.left_tree:
+            if not (connection.node.left_connection and connection.node.right_connection):
+                left_queue.enqueue({'connection': connection, 'counts': 2})
+                self.bordered[connection] = []
 
-        for node in self.right_side:
-            if not node.left_child and not node.right_child:
-                right_queue.enqueue({'node': node, 'connections': 2})
-                self.parts_connections[node] = []
+        for connection in self.right_tree:
+            if not (connection.node.left_connection and connection.node.right_connection):
+                right_queue.enqueue({'connection': connection, 'counts': 2})
+                self.bordered[connection] = []
 
-        while left_queue.size() > 0:
+        while left_queue.size() > 0 and right_queue.size() > 0:
             left_connection = left_queue.dequeue()
             right_connection = right_queue.dequeue()
 
-            while right_connection['node'] in self.parts_connections[left_connection['node']]:
+            while right_connection['connection'] in self.bordered[left_connection['connection']]:
                 right_queue.enqueue(right_connection)
                 right_connection = right_queue.dequeue()
 
-            self.parts_connections[left_connection['node']].append(right_connection['node'])
-            self.parts_connections[right_connection['node']].append(left_connection['node'])
-            left_connection['connections'] -= 1
-            right_connection['connections'] -= 1
+            self.bordered[left_connection['connection']].append(right_connection['connection'])
+            self.bordered[right_connection['connection']].append(left_connection['connection'])
 
-            if left_connection['connections'] > 0:
+            border_node = BorderNode(left_connection['connection'].node, right_connection['connection'].node)
+
+            color = random.choice(
+                list(self.colors.difference(
+                    left_connection['connection'].get_used_colors().union(right_connection['connection'].get_used_colors())))
+            )
+            if left_connection['connection'].node.right_connection is None:
+                left_connection['connection'].node.right_connection = Connection(
+                    border_node,
+                    color
+                )
+
+                right_connection['connection'].node.right_connection = Connection(
+                    border_node,
+                    color
+                )
+            else:
+                left_connection['connection'].node.left_connection = Connection(
+                    border_node,
+                    color
+                )
+
+                right_connection['connection'].node.left_connection = Connection(
+                    border_node,
+                    color
+                )
+
+            left_connection['counts'] -= 1
+            right_connection['counts'] -= 1
+
+            if left_connection['counts'] > 0:
                 left_queue.enqueue(left_connection)
-            if right_connection['connections'] > 0:
+            if right_connection['counts'] > 0:
                 right_queue.enqueue(right_connection)
-        self._merge_colors_parts()
 
     def __repr__(self):
-        right_ret = self.right_side.__repr__()
-        left_ret = self.left_side.__repr__()
+        right_ret = self.right_tree.__repr__()
+        left_ret = self.left_tree.__repr__()
         ret = ''
         max_len = 0
         for left_line in left_ret.splitlines():
@@ -112,26 +242,9 @@ class BinaryWeldedTree:
             ret += f'{left_line}{right_line}\n'
         return ret
 
-    def _merge_colors_parts(self):
-        pass
-        queue = Queue()
-        for node in self.left_side:
-            if not node.left_child and not node.right_child:
-                queue.enqueue(node)
-        while queue.size() > 0:
-            left_node = queue.dequeue()
-            choosen_parts_colors = [left_node.value]
-            for node in self.parts_connections[left_node]:
-                choosen_colors = list(set(choosen_parts_colors + [x.value for x in self.parts_connections[node]]))
-                if node.value in choosen_parts_colors + choosen_colors:
-                    node.value = self.colors_list[
-                        random.choice([c for c in range(self.colors)
-                                       if self.colors_list[c] not in choosen_parts_colors + choosen_colors])
-                    ]
-                    choosen_parts_colors.append(node.value)
-
 
 if __name__ == '__main__':
-    tree = BinaryWeldedTree(2, 4)
-    print(tree)
-    print(tree.parts_connections)
+    colors = list(Color)
+    btw = BinaryWeldedTree(2, colors[:5])
+    print(btw)
+    print(btw.bordered)
