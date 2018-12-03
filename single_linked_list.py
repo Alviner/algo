@@ -6,9 +6,6 @@ class Node:
         self.value = v
         self.next = None
 
-    def __repr__(self):
-        return self.value
-
 
 class LinkedList:
     def __init__(self):

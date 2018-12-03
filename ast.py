@@ -33,7 +33,7 @@ class ANode(TreeNode):
             return TokenType.NUMBER
 
     def __repr__(self):
-        return f'[{self.token_type.value}, {self.value}]'
+        return '['+self.token_type.value+', '+self.value+']'
 
 
 class AstStack(Stack):
@@ -64,10 +64,10 @@ class AstStack(Stack):
         index = res.rfind('(')
         while index >= 0:
             parts.append({
-                'index': f'p{part}{rec}',
+                'index': 'p'+part+rec,
                 'part': res[index + 1:res.find(')', index)]
             })
-            res = res[:index] + f'p{part}{rec}' + res[res.find(')', index) + 1:]
+            res = res[:index] + 'p'+part+rec + res[res.find(')', index) + 1:]
             part += 1
             index = res.rfind('(')
         # востанавливаем скобки в каждой из частей
@@ -119,10 +119,10 @@ class AstStack(Stack):
                         j = len(res)
                     # заменяем в строке блок на строку формата p{номер_части}{уровень_рекурсии}
                     parts.append({
-                        'index': f'p{part}{rec}',
+                        'index': 'p'+part+rec,
                         'part': '(' + res[i: j] + ')'
                     })
-                    res = res[:i] + f'p{part}{rec}' + res[j:]
+                    res = res[:i] + 'p'+part+rec + res[j:]
                     part += 1
                     index = res.find(operation)
         # восстанавливаем строку по формату и части в обратном порядке
@@ -169,7 +169,7 @@ class Ast(SimpleTree):
             node = self.root
         if node != self.root or node.token_type is not TokenType.NUMBER:
             if node.child[0].token_type is TokenType.NUMBER and node.child[1].token_type is TokenType.NUMBER:
-                node.expression = f'({node.child[0].value}{node.value}{node.child[1].value})'
+                node.expression = '('+node.child[0].value+node.value+node.child[1].value+')'
                 node.set(Ast._op_map[node.value](float(node.child[0].value), float(node.child[1].value)))
                 node.child = []
                 if node.parent is not None:
