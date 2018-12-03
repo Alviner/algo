@@ -7,7 +7,7 @@ class Node:
         self.next = None
 
     def __repr__(self):
-        return f'<Node({self.value})>'
+        return self.value
 
 
 class LinkedList:
@@ -25,7 +25,7 @@ class LinkedList:
     def print_all_nodes(self):
         node = self.head
         while node is not None:
-            print(node.value)
+            print node.value
             node = node.next
 
     def find(self, val):
@@ -91,7 +91,7 @@ class LinkedList:
             size += 1
 
 
-def merge_list(list_one: LinkedList, list_two: LinkedList):
+def merge_list(list_one, list_two):
     assert list_one.len() == list_two.len(), 'need equal size'
     res = LinkedList()
 
