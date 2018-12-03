@@ -60,11 +60,13 @@ class Connection:
         return self.node.__repr__()
 
     def get_used_colors(self):
-        colors = [self.color]
-        if self.node.left_connection:
-            colors.append(self.node.left_connection.color)
-        if self.node.right_connection:
-            colors.append(self.node.right_connection.color)
+        colors = []
+        if isinstance(self.node, Node):
+            colors.append(self.color)
+            if self.node.left_connection:
+                colors.append(self.node.left_connection.color)
+            if self.node.right_connection:
+                colors.append(self.node.right_connection.color)
         return set(colors)
 
 
@@ -79,12 +81,13 @@ class BinaryTree:
         if connection is None:
             connection = self.root
         yield connection
-        if connection.node.left_connection:
-            for item in self.__iter__(connection.node.left_connection):
-                yield item
-        if connection.node.right_connection:
-            for item in self.__iter__(connection.node.right_connection):
-                yield item
+        if isinstance(connection.node, Node):
+            if connection.node.left_connection:
+                for item in self.__iter__(connection.node.left_connection):
+                    yield item
+            if connection.node.right_connection:
+                for item in self.__iter__(connection.node.right_connection):
+                    yield item
 
     def __repr__(self, connection=None, level=1):
         ret = ''
@@ -255,8 +258,20 @@ class BinaryWeldedTree:
             ret += f'{left_line}{right_line}\n'
         return ret
 
+    def __iter__(self):
+        for connection in self.left_tree:
+            yield connection
+        for connection in self.right_tree:
+            yield connection
 
-if __name__ == '__main__':
+
+def test_btw():
     colors = list(Color)
     btw = BinaryWeldedTree(2, colors[:5])
-    print(btw)
+    for connection in btw:
+        used_colors = connection.get_used_colors()
+        assert len(used_colors) == len(set(used_colors))
+
+
+if __name__ == '__main__':
+    test_btw()
