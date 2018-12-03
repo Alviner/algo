@@ -204,6 +204,20 @@ class TestLinkedList(unittest.TestCase):
             node = node.next
             node_test = node_test.next
 
+        s_list = LinkedList()
+        s_list_test = LinkedList()
+
+        node = Node(2)
+
+        s_list.insert(None, node)
+
+        self.assertEqual(s_list.head, node)
+        self.assertEqual(s_list.tail, node)
+
+        s_list_test.add_in_tail(node)
+        self.assertEqual(s_list_test.head, node)
+        self.assertEqual(s_list_test.tail, node)
+
     def test_merge(self):
         s_list_one = LinkedList()
         s_list_one.add_in_tail(Node(1))
@@ -261,7 +275,6 @@ class TestLinkedList(unittest.TestCase):
             self.assertEqual(node.value, node_test.value)
             node = node.next
             node_test = node_test.next
-
 
 
 if __name__ == '__main__':
