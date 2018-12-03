@@ -6,6 +6,7 @@ from queue import Queue
 from termcolor import colored
 
 
+# Определяем доступные цвета
 class Color(Enum):
     red = 'red'
     grey = 'grey'
@@ -15,6 +16,7 @@ class Color(Enum):
     magenta = 'magenta'
 
 
+# Основной класс Узла дерева
 class Node:
     def __init__(self, parent=None, value=None):
         self.parent = parent
@@ -38,6 +40,7 @@ class Node:
         return f'Node({self.value})'
 
 
+# Вспомогательный класс Узла для связи деревьев
 class BorderNode:
     def __init__(self, parent_left: Node, parent_right: Node):
         self.parent_left = parent_left
@@ -47,6 +50,7 @@ class BorderNode:
         return ''
 
 
+# Класс соединения между узлов, хранит в себе собственно узел и цвет
 class Connection:
     def __init__(self, node, color: Color):
         self.node = node
@@ -64,10 +68,11 @@ class Connection:
         return set(colors)
 
 
+# Бинарное дерево
 class BinaryTree:
-    def __init__(self, root: Connection = None, reversed=False, depth: int=0):
+    def __init__(self, root: Connection = None, reverse=False, depth: int=0):
         self.root = root
-        self.reversed = reversed
+        self.reversed = reverse
         self.depth = depth
 
     def __iter__(self, connection=None):
@@ -111,6 +116,7 @@ class BinaryTree:
         return ret
 
 
+# Бинарное спаянное дерево
 class BinaryWeldedTree:
     def __init__(self, depth: int, colors_list: list):
         self.depth = depth
@@ -126,6 +132,7 @@ class BinaryWeldedTree:
 
         queue_right.enqueue(self.right_tree.root)
         queue_left.enqueue(self.left_tree.root)
+        # добавляем в деревья узлы согласно глубине
         for i in range(depth):
             left_splice = []
             right_splice = []
@@ -171,7 +178,7 @@ class BinaryWeldedTree:
         left_queue = Queue()
         right_queue = Queue()
         bordered = {}
-
+        # связываем деревья (у каждого узла есть два коннекта с узлом другого дерева)
         for connection in self.left_tree:
             if not (connection.node.left_connection and connection.node.right_connection):
                 left_queue.enqueue({'connection': connection, 'counts': 2})
@@ -197,24 +204,30 @@ class BinaryWeldedTree:
 
             color = random.choice(
                 list(self.colors.difference(
-                    left_connection['connection'].get_used_colors().union(right_connection['connection'].get_used_colors())))
+                    # Опредеояем использованные цвета у узлов которые необходимо связать
+                    left_connection['connection'].get_used_colors().union(
+                        right_connection['connection'].get_used_colors()
+                    )
+                ))
             )
             if left_connection['connection'].node.right_connection is None:
+                # связываем левое дерево с правым
                 left_connection['connection'].node.right_connection = Connection(
                     border_node,
                     color
                 )
-
+                # Связываем правое дерево с левым
                 right_connection['connection'].node.right_connection = Connection(
                     border_node,
                     color
                 )
             else:
+                # связываем левое дерево с правым
                 left_connection['connection'].node.left_connection = Connection(
                     border_node,
                     color
                 )
-
+                # связываем правое дерево с левым
                 right_connection['connection'].node.left_connection = Connection(
                     border_node,
                     color

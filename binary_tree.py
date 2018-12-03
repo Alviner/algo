@@ -53,22 +53,25 @@ class BinaryTree:
         if node.right_child is not None:
             self.reload(node.right_child)
 
-    def add(self, other, node=None):
-        if node is not None:
-            is_exist, pos = False, 'right' if node.right_child is None else 'left'
+    def add(self, node: TreeNode, parent=None):
+        if parent is not None:
+            is_exist, pos = False, 'right' if parent.right_child is None else 'left'
         else:
-            node, is_exist, pos = self.find(value=other)
+            parent, is_exist, pos = self.find(value=node.value)
         if not is_exist:
             if pos == 'right':
-                node.right_child = TreeNode(other, node)
-                self.reload(node.right_child)
-                return node.right_child
+                node.parent = parent
+                parent.right_child = node
+                self.reload(parent.right_child)
+                return parent.right_child
             elif pos == 'left':
-                node.left_child = TreeNode(other, node)
-                self.reload(node.left_child)
-                return node.left_child
+                node.parent = parent
+                parent.left_child = node
+                self.reload(parent.left_child)
+                return parent.left_child
             else:
-                self.root = TreeNode(other)
+                node.parent = None
+                self.root = node
                 return self.root
 
     def find(self, value, node=None):
@@ -139,13 +142,13 @@ class BinaryTree:
 
 def test_find():
     tree = BinaryTree()
-    tree.add(8)
-    tree.add(4)
-    tree.add(12)
-    tree.add(2)
-    tree.add(6)
-    tree.add(10)
-    tree.add(14)
+    tree.add(TreeNode(8))
+    tree.add(TreeNode(4))
+    tree.add(TreeNode(12))
+    tree.add(TreeNode(2))
+    tree.add(TreeNode(6))
+    tree.add(TreeNode(10))
+    tree.add(TreeNode(14))
 
     node, is_exist, pos = tree.find(8)
     assert node == tree.root and is_exist and pos == '-'
@@ -159,13 +162,13 @@ def test_find():
 
 def test_add():
     tree = BinaryTree()
-    tree.add(8)
-    tree.add(4)
-    tree.add(12)
-    tree.add(2)
-    tree.add(6)
-    tree.add(10)
-    tree.add(14)
+    tree.add(TreeNode(8))
+    tree.add(TreeNode(4))
+    tree.add(TreeNode(12))
+    tree.add(TreeNode(2))
+    tree.add(TreeNode(6))
+    tree.add(TreeNode(10))
+    tree.add(TreeNode(14))
 
     assert tree.root.value == 8
     assert tree.root.left_child.value == 4
@@ -176,13 +179,13 @@ def test_add():
 
 def test_minmax():
     tree = BinaryTree()
-    tree.add(8)
-    tree.add(4)
-    tree.add(12)
-    tree.add(2)
-    tree.add(6)
-    tree.add(10)
-    tree.add(14)
+    tree.add(TreeNode(8))
+    tree.add(TreeNode(4))
+    tree.add(TreeNode(12))
+    tree.add(TreeNode(2))
+    tree.add(TreeNode(6))
+    tree.add(TreeNode(10))
+    tree.add(TreeNode(14))
 
     assert tree.find_minimum().value == 2
     assert tree.find_maximum().value == 14
@@ -192,21 +195,21 @@ def test_minmax():
 
 def test_remove():
     tree = BinaryTree()
-    tree.add(8)
-    tree.add(4)
-    tree.add(12)
-    tree.add(2)
-    tree.add(6)
-    tree.add(10)
-    tree.add(14)
-    tree.add(1)
-    tree.add(3)
-    tree.add(5)
-    tree.add(7)
-    tree.add(9)
-    tree.add(11)
-    tree.add(13)
-    tree.add(15)
+    tree.add(TreeNode(8))
+    tree.add(TreeNode(4))
+    tree.add(TreeNode(12))
+    tree.add(TreeNode(2))
+    tree.add(TreeNode(6))
+    tree.add(TreeNode(10))
+    tree.add(TreeNode(14))
+    tree.add(TreeNode(1))
+    tree.add(TreeNode(3))
+    tree.add(TreeNode(5))
+    tree.add(TreeNode(7))
+    tree.add(TreeNode(9))
+    tree.add(TreeNode(11))
+    tree.add(TreeNode(13))
+    tree.add(TreeNode(15))
 
     tree.remove(8)
     assert tree.root.value == 9

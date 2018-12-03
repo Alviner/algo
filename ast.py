@@ -4,7 +4,7 @@ import operator
 
 from stack import Stack
 from simple_tree import SimpleTree, TreeNode
-
+import time
 
 class TokenType(Enum):
     BRACKET = 'скобка'
@@ -247,6 +247,8 @@ def test_translate():
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     test_parser()
     test_ast()
     test_translate()
+    print("--- %s seconds ---" % (time.time() - start_time))
