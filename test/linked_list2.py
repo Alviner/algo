@@ -143,6 +143,13 @@ class TestLinkedList2(unittest.TestCase):
         self.assertEqual(self.list.head.next.next.next.prev, node_list[2])
         self.assertEqual(self.list.head.next.next.next.next, node_list[3])
 
+        last_node = Node(1243)
+        node_prev = self.list.tail
+        self.list.insert(None, last_node)
+        self.assertEqual(self.list.tail, last_node)
+        self.assertEqual(node_prev, last_node.prev)
+        self.assertEqual(node_prev.next, last_node)
+
     def test_add_in_head(self):
         insert_node = [
             Node(2),
