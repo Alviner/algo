@@ -79,7 +79,6 @@ class LinkedList:
                 self.head = new_node
             return
         node = self.head
-        size = 0
         while node is not None:
             if node == after_node:
                 if node == self.tail:
@@ -88,7 +87,6 @@ class LinkedList:
                 node.next = new_node
                 return
             node = node.next
-            size += 1
 
 
 def merge_list(list_one, list_two):

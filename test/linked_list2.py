@@ -60,7 +60,6 @@ class TestLinkedList2(unittest.TestCase):
         self.assertIsNone(self.list.head)
         self.assertIsNone(self.list.tail)
 
-
         for node in node_list:
             self.list.add_in_tail(node)
         self.list.delete(1)
@@ -120,23 +119,29 @@ class TestLinkedList2(unittest.TestCase):
             Node(1),
             Node(10),
         ]
-        for node in node_list:
-            self.list.add_in_tail(node)
 
-        self.list.insert(None, insert_node[0])
-        self.assertEqual(self.list.head, insert_node[0])
-        self.assertIsNone(self.list.head.prev)
+        node_prev = None
+        for node in node_list:
+            self.list.insert(node_prev, node)
+            self.assertIsNone(node.next)
+            self.assertEqual(self.list.tail, node)
+            self.assertEqual(self.list.tail.prev, node_prev)
+            if node_prev is not None:
+                self.assertEqual(node_prev.next, node)
+            node_prev = node
 
         self.list.insert(node_list[-1], insert_node[1])
         self.assertEqual(self.list.tail, insert_node[1])
+        self.assertEqual(node_list[-1].next, insert_node[1])
+        self.assertEqual(insert_node[1].prev, node_list[-1])
         self.assertIsNone(self.list.tail.next)
 
         self.list.insert(node_list[2], insert_node[2])
-        self.assertEqual(self.list.head.next.next.next.next, insert_node[2])
-        self.assertIsNotNone(self.list.head.next.next.next.next.next)
-        self.assertIsNotNone(self.list.head.next.next.next.next.prev)
-        self.assertEqual(self.list.head.next.next.next.next.prev, node_list[2])
-        self.assertEqual(self.list.head.next.next.next.next.next, node_list[3])
+        self.assertEqual(self.list.head.next.next.next, insert_node[2])
+        self.assertIsNotNone(self.list.head.next.next.next.next)
+        self.assertIsNotNone(self.list.head.next.next.next.prev)
+        self.assertEqual(self.list.head.next.next.next.prev, node_list[2])
+        self.assertEqual(self.list.head.next.next.next.next, node_list[3])
 
     def test_add_in_head(self):
         insert_node = [
