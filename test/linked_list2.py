@@ -54,6 +54,13 @@ class TestLinkedList2(unittest.TestCase):
             Node(9),
             Node(10)
         ]
+
+        self.list.add_in_tail(node_list[0])
+        self.list.delete(1)
+        self.assertIsNone(self.list.head)
+        self.assertIsNone(self.list.tail)
+
+
         for node in node_list:
             self.list.add_in_tail(node)
         self.list.delete(1)

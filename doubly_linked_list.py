@@ -61,6 +61,8 @@ class LinkedList2:
                     self.head = node.next
                     if node.next is not None:
                         node.next.prev = None
+                    else:
+                        self.tail = None
                 elif node.next is None:
                     self.tail = node.prev
                     node.prev.next = None
