@@ -9,6 +9,9 @@ class DynArray:
         self.capacity = 16
         self.array = self.make_array(self.capacity)
 
+    def __len__(self):
+        return self.count
+
     def make_array(self, new_capacity):
         return (new_capacity * ctypes.py_object)()
 
