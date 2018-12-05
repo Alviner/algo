@@ -58,7 +58,7 @@ class DynArray:
             else:
                 self.array[item] = self.array[item + 1]
         self.count -= 1
-        if self.count <= 2 * self.capacity:
+        if 2 * self.count <= self.capacity:
             new_capacity = max(int(2 * self.capacity / 3), 16)
             self.resize(new_capacity)
 
