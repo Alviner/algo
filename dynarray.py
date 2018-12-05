@@ -47,7 +47,7 @@ class DynArray:
             elif item == i:
                 self.array[item] = itm
             else:
-                self.array[item] = self.array[item]
+                continue
 
     def delete(self, i):  # O(n)
         if 0 > i >= self.count:
