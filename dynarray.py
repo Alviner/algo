@@ -13,7 +13,7 @@ class DynArray:
         return (new_capacity * ctypes.py_object)()
 
     def __getitem__(self, item):
-        if 0 > item >= self.count:
+        if 0 < item >= self.count:
             raise IndexError('Index out of bounds')
         return self.array[item]
 
@@ -31,29 +31,20 @@ class DynArray:
         self.count += 1
 
     def insert(self, i, itm):  # O(n)
-        if 0 > i >= self.count:
+        if 0 < i > self.count:
             raise IndexError('Index out of bounds')
-        if i == self.count:
+        if self.count == 0:
             self.append(itm)
             return
-        if self.count == self.capacity:
-            new_capacity = 2 * self.capacity
-            new_array = self.make_array(new_capacity)
-        else:
-            new_capacity = self.capacity
-            new_array = self.array
+        self.append(None)
 
         for item in reversed(range(self.count)):
-            if item < i:
-                new_array[item] = self.array[item]
+            if item > i:
+                self.array[item] = self.array[item - 1]
             elif item == i:
-                new_array[item + 1] = self.array[item]
-                new_array[item] = itm
+                self.array[item] = itm
             else:
-                new_array[item + 1] = self.array[item]
-        self.count += 1
-        self.array = new_array
-        self.capacity = new_capacity
+                self.array[item] = self.array[item]
 
     def delete(self, i):  # O(n)
         if 0 > i >= self.count:
@@ -68,49 +59,3 @@ class DynArray:
             new_capacity = max(int(2 * self.capacity / 3), 16)
             self.resize(new_capacity)
 
-
-def test_insert():
-    da = DynArray()
-    da.insert(0, 1)
-    da.insert(0, 2)
-    da.insert(1, 4)
-    da.insert(2, 6)
-    da.insert(2, 8)
-    da.insert(1, 0)
-    da.insert(2, 3)
-    da.insert(4, 5)
-
-    da_test = (2, 0, 3, 4, 5, 8, 6, 1)
-
-    assert len(da_test) == da.count
-
-    for i in range(da.count):
-        assert da_test[i] == da[i]
-
-
-def test_delete():
-    da = DynArray()
-    da.append(0)
-    da.append(1)
-    da.append(2)
-    da.append(3)
-    da.append(4)
-    da.append(5)
-    da.append(6)
-    da.append(7)
-    da.append(8)
-
-    da.delete(0)
-    da.delete(7)
-    da.delete(2)
-
-    da_test = (1, 2, 4, 5, 6, 7)
-
-    assert len(da_test) == da.count
-
-    for i in range(da.count):
-        assert da_test[i] == da[i]
-
-
-if __name__ == '__main__':
-    test_insert()
