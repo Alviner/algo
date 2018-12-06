@@ -16,7 +16,7 @@ class DynArray:
         return (new_capacity * ctypes.py_object)()
 
     def __getitem__(self, item):
-        if 0 < item >= self.count:
+        if item < 0 or item >= self.count:
             raise IndexError('Index out of bounds')
         return self.array[item]
 
@@ -34,7 +34,7 @@ class DynArray:
         self.count += 1
 
     def insert(self, i, itm):  # O(n)
-        if 0 < i > self.count:
+        if i < 0 or i > self.count:
             raise IndexError('Index out of bounds')
         if self.count == 0:
             self.append(itm)
@@ -46,8 +46,6 @@ class DynArray:
                 self.array[item] = self.array[item - 1]
             elif item == i:
                 self.array[item] = itm
-            else:
-                continue
 
     def delete(self, i):  # O(n)
         if 0 > i >= self.count:

@@ -12,6 +12,7 @@ class TestDynArray(unittest.TestCase):
     def is_equal(self, base_arr, tested_arr):
         for i, it in enumerate(base_arr):
             self.assertEqual(tested_arr[i], it)
+        self.assertEqual(len(base_arr), len(tested_arr))
 
     def test_insert_fixed_buffer(self):
         self.array.insert(0, 1)
@@ -56,8 +57,10 @@ class TestDynArray(unittest.TestCase):
             self.assertEqual(self.array[it], item)
             self.assertEqual(self.array.capacity, 16)
             created_arr.insert(it, item)
+            self.is_equal(created_arr, self.array)
         self.array.insert(0, -1)
         created_arr.insert(0, -1)
+        self.assertEqual(self.array[len(self.array) - 1], created_arr[len(created_arr) - 1])
         self.assertEqual(self.array.capacity, 16 * 2)
 
         self.is_equal(created_arr, self.array)
@@ -109,3 +112,7 @@ class TestDynArray(unittest.TestCase):
             self.array.delete(i)
             self.is_equal(created_arr, self.array)
             self.assertEqual(len(created_arr), self.array.count)
+
+        with self.assertRaises(IndexError):
+            self.array.delete(120)
+            self.array.delete(-1)
