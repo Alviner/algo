@@ -67,6 +67,7 @@ class TestDynArray(unittest.TestCase):
 
         with self.assertRaises(IndexError):
             self.array.insert(120, 2341)
+        with self.assertRaises(IndexError):
             self.array.insert(-1, 1)
 
     def test_delete(self):
@@ -115,4 +116,5 @@ class TestDynArray(unittest.TestCase):
 
         with self.assertRaises(IndexError):
             self.array.delete(120)
+        with self.assertRaises(IndexError):
             self.array.delete(-1)
