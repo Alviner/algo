@@ -13,7 +13,10 @@ class Stack:
     def pop(self, index=None):  # O(n) когда работаем с головой списка, O(1) когда работали с хвостом
         if self.size() == 0:
             return None
-        return self.stack.pop(index)
+        if index is None:
+            return self.stack.pop()
+        else:
+            return self.stack.pop(index)
 
     def push(self, item):  # O(n)
         return self.stack.append(item)
@@ -25,6 +28,9 @@ class Stack:
 
     def size(self):
         return len(self.stack)
+
+    def __iter__(self):
+        return self.stack.__iter__()
 
 
 def check_balansed(bracket_string):
@@ -90,8 +96,3 @@ def test_calculate():
     assert string_calculate("1 2 + 3 * =") == 9
     assert string_calculate("8 2 + 5 * 9 + =") == 59
     assert string_calculate("2 2 - =") == 0
-
-
-if __name__ == '__main__':
-    test_balansed()
-    test_calculate()
