@@ -24,10 +24,13 @@ class Stack:
     def peak(self):
         if self.size() == 0:
             return None
-        return self.stack[0]
+        return self.stack[-1]
 
     def size(self):
-        return len(self.stack)
+        return self.stack.__len__()
+
+    def __len__(self):
+        return self.stack.__len__()
 
     def __iter__(self):
         return self.stack.__iter__()
