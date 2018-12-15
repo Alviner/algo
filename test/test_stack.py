@@ -18,6 +18,8 @@ class TestStack(unittest.TestCase):
     def test_push(self):
         test_items = [random.randint(-100, 100) for x in range(100)]
 
+        self.assertEqual(self.stack.size(), 0)
+
         for i in test_items:
             self.stack.push(i)
             self.test_stack.append(i)
