@@ -14,7 +14,10 @@ class Queue:
         return self.items.pop()
 
     def size(self):
-        return len(self.items)
+        return self.items.__len__()
+
+    def __len__(self):
+        return self.items.__len__()
 
     def rotate(self, N):
         for i in range(N):
@@ -41,38 +44,3 @@ class StackQueue:
 
     def size(self):
         return self.right.size() + self.left.size()
-
-
-def test_rotate():
-    qu = Queue()
-    qu.enqueue(1)
-    qu.enqueue(2)
-    qu.enqueue(3)
-    qu.enqueue(4)
-
-    qu_stack = StackQueue()
-    qu_stack.enqueue(1)
-    qu_stack.enqueue(2)
-    qu_stack.enqueue(3)
-    qu_stack.enqueue(4)
-
-    qu.rotate(22)
-    qu_stack.rotate(22)
-    qu.enqueue(5)
-    qu_stack.enqueue(5)
-
-    qu_test = Queue()
-    qu_test.enqueue(3)
-    qu_test.enqueue(4)
-    qu_test.enqueue(1)
-    qu_test.enqueue(2)
-    qu_test.enqueue(5)
-
-    assert qu.size() == qu_test.size() == qu_stack.size()
-
-    while qu.size() > 0:
-        assert qu.dequeue() == qu_test.dequeue() == qu_stack.dequeue()
-
-
-if __name__ == '__main__':
-    test_rotate()
