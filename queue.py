@@ -44,3 +44,4 @@ class StackQueue:
 
     def size(self):
         return self.right.size() + self.left.size()
+
