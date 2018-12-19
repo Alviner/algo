@@ -17,10 +17,16 @@ class Deque:
         return self.queue.insert(0, item)
 
     def removeFront(self):  # O(1)
-        return self.queue.pop()
+        res = None
+        if len(self.queue) > 0:
+            res = self.queue.pop()
+        return res
 
     def removeTail(self):  # O(n)
-        return self.queue.pop(0)
+        res = None
+        if len(self.queue) > 0:
+            res = self.queue.pop(0)
+        return res
 
     def size(self):
         return len(self.queue)
@@ -59,7 +65,3 @@ def test_palindrome():
     assert check_palindrome(check_string)
     check_string = '223'
     assert not check_palindrome(check_string)
-
-
-if __name__ == '__main__':
-    test_palindrome()
