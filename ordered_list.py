@@ -7,53 +7,22 @@ class Node:
         self.next = None
         self.prev = None
 
-    def __eq__(self, other):
-        return self.value == other.value
-
-    def __lt__(self, other):
-        return self.value < other.value
-
-    def __gt__(self, other):
-        return self.value > other.value
-
-    def __le__(self, other):
-        return self.value <= other.value
-
-    def __ge__(self, other):
-        return self.value >= other.value
-
-    def __repr__(self):
-        return f'-> {self.value}'
-
-
-class NodeStr(Node):
-    def __init__(self, v):
-        super(NodeStr, self).__init__(v)
-
-    def __eq__(self, other):
-        return self.value.strip() == other.value.strip()
-
-    def __lt__(self, other):
-        return self.value.strip() < other.value.strip()
-
-    def __gt__(self, other):
-        return self.value.strip() > other.value.strip()
-
-    def __le__(self, other):
-        return self.value.strip() <= other.value.strip()
-
-    def __ge__(self, other):
-        return self.value.strip() >= other.value.strip()
-
 
 class OrderedList:
-    asc = 'asc'
-    desc = 'desc'
 
-    def __init__(self):
+    def __init__(self, asc):
         self.head = None
         self.tail = None
-        self.order = None
+        self.__ascending = asc
+
+    def compare(self, v1, v2):
+        if v1.value > v2.value:
+            res = 1
+        elif v1.value == v2.value:
+            res = 0
+        else:
+            res = -1
+        return res
 
     def print_all_nodes(self):
         node = self.head
@@ -67,27 +36,25 @@ class OrderedList:
         node = self.head
         go_next = True
 
-        if self.order in (OrderedList.asc, OrderedList.desc):
-            while node is not None and go_next:
-                if (node <= item and self.order == OrderedList.asc) or (node >= item and self.order == OrderedList.desc):
-                    node = node.next
-                else:
-                    go_next = False
+        while node is not None and go_next:
+            if (self.compare(node, item) <= 0 and self.__ascending) or \
+                    (self.compare(node, item) >= 0 and not self.__ascending):
+                node = node.next
+            else:
+                go_next = False
 
-            if node is None:  # Дошли до конца списка
-                self.__add_in_tail(item)
-            elif node.prev is None:  # Находимся на первом элементе
-                self.__add_in_head(item)
-            else:  # Вставка в середину
-                item.next = node
-                item.prev = node.prev
+        if node is None:  # Дошли до конца списка
+            self.add_in_tail(item)
+        elif node.prev is None:  # Находимся на первом элементе
+            self.add_in_head(item)
+        else:  # Вставка в середину
+            item.next = node
+            item.prev = node.prev
 
-                node.prev.next = item
-                node.prev = item
-        else:
-            self.__add_in_tail(item)
+            node.prev.next = item
+            node.prev = item
 
-    def __add_in_tail(self, item):
+    def add_in_tail(self, item):
         if self.head is None:
             self.head = item
             item.prev = None
@@ -97,7 +64,7 @@ class OrderedList:
             item.prev = self.tail
         self.tail = item
 
-    def __add_in_head(self, item):
+    def add_in_head(self, item):
         if self.tail is None:
             self.tail = item
             item.prev = None
@@ -116,158 +83,58 @@ class OrderedList:
         node = self.head
         temp = Node(item)
         go_next = True
-        if self.order in (OrderedList.asc, OrderedList.desc):
-            while node is not None and go_next:
-                if (node >= temp and self.order == OrderedList.asc) or (node <= temp and self.order == OrderedList.desc):
-                    go_next = False
-                else:
-                    node = node.next
-            if node is not None:
-                return node if node == temp else None
-        else:
-            while node is not None:
-                if node == temp:
-                    return node
+        while node is not None and go_next:
+            if (self.compare(node, temp) >= 0 and self.__ascending) or (
+                    self.compare(node, temp) <= 0 and not self.__ascending):
+                go_next = False
+            else:
                 node = node.next
+        if node is not None:
+            return node if self.compare(node, temp) == 0 else None
         return None
 
-    def size(self):
+    def clean(self):
+        self.__init__(self.__ascending)
+
+    def delete(self, value):
+        node = self.find(value)
+        if node is not None:
+            if node.prev is None:
+                self.head = node.next
+                if node.next is not None:
+                    node.next.prev = None
+                else:
+                    self.tail = None
+            elif node.next is None:
+                self.tail = node.prev
+                node.prev.next = None
+            else:
+                node.prev.next = node.next
+                node.next.prev = node.prev
+
+    def len(self):
+        return len(self.get_all())
+
+    def get_all(self):
+        r = []
         node = self.head
-        res = 0
         while node is not None:
-            res += 1
+            r.append(node)
             node = node.next
+        return r
+
+
+class OrderedStringList(OrderedList):
+    def __init__(self, asc):
+        super(OrderedStringList, self).__init__(asc)
+
+    def compare(self, v1_str, v2_str):
+        v1 = v1_str.value.split()
+        v2 = v2_str.value.split()
+        if v1 > v2:
+            res = 1
+        elif v1 == v2:
+            res = 0
+        else:
+            res = -1
         return res
-
-
-def test_order_numbers():
-    ol = OrderedList()
-    ol.order = OrderedList.asc
-    ol.add(Node(1))
-    ol.add(Node(7))
-    ol.add(Node(2))
-    ol.add(Node(5))
-    ol.add(Node(4))
-    ol.add(Node(3))
-    ol.add(Node(0))
-    ol_test = OrderedList()
-    ol_test.__add_in_tail(Node(0))
-    ol_test.__add_in_tail(Node(1))
-    ol_test.__add_in_tail(Node(2))
-    ol_test.__add_in_tail(Node(3))
-    ol_test.__add_in_tail(Node(4))
-    ol_test.__add_in_tail(Node(5))
-    ol_test.__add_in_tail(Node(7))
-
-    assert ol.size() == ol_test.size()
-
-    node = ol.head
-    node_test = ol_test.head
-    while node is not None and node_test is not None:
-        assert node == node_test
-        node = node.next
-        node_test = node_test.next
-
-    ol = OrderedList()
-    ol.order = OrderedList.desc
-    ol.add(Node(1))
-    ol.add(Node(7))
-    ol.add(Node(2))
-    ol.add(Node(5))
-    ol.add(Node(4))
-    ol.add(Node(3))
-    ol.add(Node(0))
-    ol_test = OrderedList()
-    ol_test.__add_in_tail(Node(7))
-    ol_test.__add_in_tail(Node(5))
-    ol_test.__add_in_tail(Node(4))
-    ol_test.__add_in_tail(Node(3))
-    ol_test.__add_in_tail(Node(2))
-    ol_test.__add_in_tail(Node(1))
-    ol_test.__add_in_tail(Node(0))
-
-    assert ol.size() == ol_test.size()
-
-    node = ol.head
-    node_test = ol_test.head
-    while node is not None and node_test is not None:
-        assert node == node_test
-        node = node.next
-        node_test = node_test.next
-
-
-def test_order_string():
-    ol = OrderedList()
-    ol.order = OrderedList.asc
-    ol.add(NodeStr(' 1'))
-    ol.add(NodeStr('7 '))
-    ol.add(NodeStr(' 2'))
-    ol.add(NodeStr('5 '))
-    ol.add(NodeStr(' 4'))
-    ol.add(NodeStr('3 '))
-    ol.add(NodeStr(' 0'))
-    ol_test = OrderedList()
-    ol_test.__add_in_tail(NodeStr('0'))
-    ol_test.__add_in_tail(NodeStr('1'))
-    ol_test.__add_in_tail(NodeStr('2'))
-    ol_test.__add_in_tail(NodeStr('3'))
-    ol_test.__add_in_tail(NodeStr('4'))
-    ol_test.__add_in_tail(NodeStr('5'))
-    ol_test.__add_in_tail(NodeStr('7'))
-
-    assert ol.size() == ol_test.size()
-
-    node = ol.head
-    node_test = ol_test.head
-    while node is not None and node_test is not None:
-        assert node == node_test
-        node = node.next
-        node_test = node_test.next
-
-    ol = OrderedList()
-    ol.order = OrderedList.desc
-    ol.add(NodeStr('  1 '))
-    ol.add(NodeStr('7 '))
-    ol.add(NodeStr('   2'))
-    ol.add(NodeStr('5   '))
-    ol.add(NodeStr(' 4'))
-    ol.add(NodeStr('3  '))
-    ol.add(NodeStr('   0'))
-    ol_test = OrderedList()
-    ol_test.__add_in_tail(NodeStr('  7'))
-    ol_test.__add_in_tail(NodeStr('5 '))
-    ol_test.__add_in_tail(NodeStr(' 4'))
-    ol_test.__add_in_tail(NodeStr('3 '))
-    ol_test.__add_in_tail(NodeStr(' 2'))
-    ol_test.__add_in_tail(NodeStr('1 '))
-    ol_test.__add_in_tail(NodeStr(' 0'))
-
-    assert ol.size() == ol_test.size()
-
-    node = ol.head
-    node_test = ol_test.head
-    while node is not None and node_test is not None:
-        assert node == node_test
-        node = node.next
-        node_test = node_test.next
-
-
-def test_find():
-    ol = OrderedList()
-    ol.order = OrderedList.asc
-    ol.add(Node(1))
-    ol.add(Node(7))
-    ol.add(Node(2))
-    ol.add(Node(5))
-    ol.add(Node(4))
-    ol.add(Node(3))
-    ol.add(Node(0))
-
-    assert ol.find(5) == Node(5)
-    assert ol.find(-1) is None
-
-
-if __name__ == '__main__':
-    test_order_numbers()
-    test_order_string()
-    test_find()
