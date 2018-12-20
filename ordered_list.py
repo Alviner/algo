@@ -36,9 +36,11 @@ class OrderedList:
         node = self.head
         go_next = True
 
+        new_node = Node(item)
+
         while node is not None and go_next:
-            if (self.compare(node, item) <= 0 and self.__ascending) or \
-                    (self.compare(node, item) >= 0 and not self.__ascending):
+            if (self.compare(node, new_node) <= 0 and self.__ascending) or \
+                    (self.compare(node, new_node) >= 0 and not self.__ascending):
                 node = node.next
             else:
                 go_next = False
@@ -48,31 +50,33 @@ class OrderedList:
         elif node.prev is None:  # Находимся на первом элементе
             self.add_in_head(item)
         else:  # Вставка в середину
-            item.next = node
-            item.prev = node.prev
+            new_node.next = node
+            new_node.prev = node.prev
 
-            node.prev.next = item
-            node.prev = item
+            node.prev.next = new_node
+            node.prev = new_node
 
     def add_in_tail(self, item):
+        new_node = Node(item)
         if self.head is None:
-            self.head = item
-            item.prev = None
-            item.next = None
+            self.head = new_node
+            new_node.prev = None
+            new_node.next = None
         else:
-            self.tail.next = item
-            item.prev = self.tail
-        self.tail = item
+            self.tail.next = new_node
+            new_node.prev = self.tail
+        self.tail = new_node
 
     def add_in_head(self, item):
+        new_node = Node(item)
         if self.tail is None:
-            self.tail = item
-            item.prev = None
-            item.next = None
+            self.tail = new_node
+            new_node.prev = None
+            new_node.next = None
         else:
-            self.head.prev = item
-            item.next = self.head
-        self.head = item
+            self.head.prev = new_node
+            new_node.next = self.head
+        self.head = new_node
 
     def find(self, item):  # O(n) ~ O(1)
         """
