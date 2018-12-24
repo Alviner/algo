@@ -31,4 +31,8 @@ class HashTable:
             self.slots[hash_key] = value
 
     def find(self, value):
-        return self.seek_slot(value)
+        index = self.seek_slot(value)
+        if index is not None:
+            if self.slots[index] is not None:
+                return index
+        return None
